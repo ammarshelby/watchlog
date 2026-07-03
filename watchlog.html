@@ -27,6 +27,7 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.02em}
 .addb{background:var(--acc);color:#1A1408;border:none;border-radius:10px;padding:0 14px;font-weight:700;font-size:14px}
 nav{display:flex;gap:6px;overflow-x:auto;padding:10px 0 6px;scrollbar-width:none}
 nav::-webkit-scrollbar{display:none}
+  body.searching nav{display:none}
 nav button,.chips button{background:var(--card);border:1px solid var(--line);color:#B9B3CC;border-radius:999px;padding:7px 12px;font-size:13px;white-space:nowrap}
 nav button.on,.chips button.on{background:var(--acc);border-color:var(--acc);color:#1A1408;font-weight:700}
 nav em{font-style:normal;font-size:11px;color:inherit;opacity:.65;margin-left:2px}
@@ -249,12 +250,19 @@ function patchRow(key,item,isMovie){
 // ---------- rendering ----------
 function toast(msg){let t=$('#toast');if(t)t.remove();t=document.createElement('div');t.id='toast';t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),1900)}
 
-function render(){
-  const app=$('#app');
-  if(view.detail){app.innerHTML=view.detail.movie?movieDetail(view.detail.item):showDetail(view.detail.item);afterRender();return}
+function headerHTML(){
   const eps=data.series.reduce((a,s)=>a+showWatched(s),0);
   const mw=data.movies.filter(m=>m.w).length;
   const counts=STATUS.map((_,i)=>data.series.filter(s=>s.s===i).length);
+  return '<header><div class="brand"><span class="mark">\u25b8</span><h1>Watch Log</h1><span class="tally mono">'+fmt(eps)+' eps \u00b7 '+fmt(mw)+' films</span><button class="gear" id="gear" aria-label="Settings">\u2699\ufe0e</button></div>'
+  +'<div class="srow"><input id="q" placeholder="Search everything\u2026" value="'+esc(view.q)+'" autocomplete="off">'
+  +'<button class="clear" id="qclear" style="'+(view.q?'':'display:none')+'">\u2715</button>'
+  +'<button class="addb" id="addb">+ Add</button></div>'
+  +'<nav>'+STATUS.map((st,i)=>'<button data-tab="'+i+'" class="'+(view.tab===i?'on':'')+'">'+st.l+' <em>'+counts[i]+'</em></button>').join('')
+  +'<button data-tab="4" class="'+(view.tab===4?'on':'')+'">Movies <em>'+data.movies.length+'</em></button>'
+  +'<button data-tab="5" class="'+(view.tab===5?'on':'')+'">Stats</button></nav></header>';
+}
+function mainBody(){
   const searching=view.q.trim().length>0, ql=view.q.trim().toLowerCase();
   let sl=[],ml=[];
   if(searching){sl=data.series.filter(s=>s.t.toLowerCase().includes(ql));ml=data.movies.filter(m=>m.t.toLowerCase().includes(ql))}
@@ -275,17 +283,28 @@ function render(){
   body+=sl.map(seriesRow).join('');
   if(searching&&ml.length&&sl.length)body+='<p class="results">Movies</p>';
   body+=ml.map(movieRow).join('');
-  if(!searching&&view.tab===5)body+=statsView(eps,mw);
-  if(!body.trim()||(view.tab!==5&&!sl.length&&!ml.length))body+='<p class="empty">'+(searching?'No matches. Use + Add to log it.':'Nothing here yet.')+'</p>';
-
-  app.innerHTML='<header><div class="brand"><span class="mark">▸</span><h1>Watch Log</h1><span class="tally mono">'+fmt(eps)+' eps · '+fmt(mw)+' films</span><button class="gear" id="gear" aria-label="Settings">⚙︎</button></div>'
-  +'<div class="srow"><input id="q" placeholder="Search everything…" value="'+esc(view.q)+'">'
-  +'<button class="addb" id="addb">+ Add</button></div>'
-  +(searching?'':'<nav>'+STATUS.map((st,i)=>'<button data-tab="'+i+'" class="'+(view.tab===i?'on':'')+'">'+st.l+' <em>'+counts[i]+'</em></button>').join('')
-    +'<button data-tab="4" class="'+(view.tab===4?'on':'')+'">Movies <em>'+data.movies.length+'</em></button>'
-    +'<button data-tab="5" class="'+(view.tab===5?'on':'')+'">Stats</button></nav>')
-  +'</header><main>'+body+'</main>';
-  afterRender();
+  if(!searching&&view.tab===5){
+    const eps=data.series.reduce((a,s)=>a+showWatched(s),0);
+    const mw=data.movies.filter(m=>m.w).length;
+    body+=statsView(eps,mw);
+  }
+  if(!searching&&view.tab<=3&&sl.length===0)body+='<p class="empty">Nothing here yet. Add a show or move one into this list.</p>';
+  if(!searching&&view.tab===4&&ml.length===0)body+='<p class="empty">No movies match this filter.</p>';
+  if(searching&&sl.length+ml.length===0)body+='<p class="empty">Not in your library. Tap + Add to search all of TMDB for \u201c'+esc(view.q.trim())+'\u201d.</p>';
+  return body;
+}
+function updateMain(){
+  document.body.classList.toggle('searching',view.q.trim().length>0);
+  const main=document.querySelector('#app main'); if(!main)return;
+  main.innerHTML=mainBody();
+  bindMain();
+}
+function render(){
+  const app=$('#app');
+  if(view.detail){app.innerHTML=view.detail.movie?movieDetail(view.detail.item):showDetail(view.detail.item);bindDetail();return}
+  app.innerHTML=headerHTML()+'<main></main>';
+  bindHeader();
+  updateMain();
   if(!settings.tmdb&&!settings.dismissedSetup){settings.dismissedSetup=1;saveSettings();openSettings(true)}
 }
 
@@ -482,37 +501,45 @@ function openAdd(){
 }
 
 // ---------- events ----------
-function afterRender(){
-  const app=$('#app');
-  const qi=$('#q'); if(qi){qi.oninput=()=>{view.q=qi.value;clearTimeout(window.__qT);window.__qT=setTimeout(renderKeepFocus,180)}}
-  if($('#gear'))$('#gear').onclick=()=>openSettings(false);
-  if($('#addb'))$('#addb').onclick=openAdd;
-  app.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{view.tab=+b.dataset.tab;render()});
-  app.querySelectorAll('[data-mf]').forEach(b=>b.onclick=()=>{view.mfilter=b.dataset.mf;render()});
-  app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const[k,id]=b.dataset.open.split(':');
+function bindHeader(){
+  const qi=$('#q');
+  qi.oninput=()=>{view.q=qi.value;$('#qclear').style.display=qi.value?'':'none';
+    clearTimeout(window.__qT);window.__qT=setTimeout(updateMain,150)};
+  $('#qclear').onclick=()=>{qi.value='';view.q='';$('#qclear').style.display='none';updateMain();};
+  $('#gear').onclick=()=>openSettings(false);
+  $('#addb').onclick=openAdd;
+  document.querySelectorAll('#app nav [data-tab]').forEach(b=>b.onclick=()=>{
+    view.tab=+b.dataset.tab;view.openSeason=null;
+    document.querySelectorAll('#app nav [data-tab]').forEach(x=>x.classList.toggle('on',x===b));
+    updateMain()});
+}
+function bindMain(){
+  const main=document.querySelector('#app main'); if(!main)return;
+  main.querySelectorAll('[data-mf]').forEach(b=>b.onclick=()=>{view.mfilter=b.dataset.mf;updateMain()});
+  main.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const[k,id]=b.dataset.open.split(':');
     const item=(k==='s'?data.series:data.movies).find(x=>x.id===id);
     view.detail={item,movie:k==='m'};view.openSeason=null;window.scrollTo(0,0);render()});
-  app.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{view.detail=null;render()});
-  if(view.detail){
-    const it=view.detail.item, kind=view.detail.movie?'movies':'series';
-    app.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{it.s=+b.dataset.st;save();render()});
-    app.querySelectorAll('[data-fav]').forEach(b=>b.onclick=()=>{it.f=!it.f;save();render()});
-    app.querySelectorAll('[data-mw]').forEach(b=>b.onclick=()=>{it.w=!it.w;if(it.w)it.l=today();save();render()});
-    app.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(!confirm('Delete "'+it.t+'" from your library?'))return;
-      data[kind]=data[kind].filter(x=>x.id!==it.id);save();view.detail=null;render();toast('Removed')});
-    app.querySelectorAll('[data-season]').forEach(b=>b.onclick=()=>{const n=+b.dataset.season;view.openSeason=view.openSeason===n?null:n;render()});
-    app.querySelectorAll('[data-sall]').forEach(b=>{b.onclick=e=>{e.stopPropagation();
-      const[,sn]=b.dataset.sall.split(':');const se=it.seasons.find(x=>x.n===+sn&&!x.sp);
-      se.w=seasonWatched(se)>=se.total?0:-1;if(se.w===-1)it.l=today();save();render()}});
-    app.querySelectorAll('[data-ep]').forEach(b=>b.onclick=()=>{
-      const[,sn,en]=b.dataset.ep.split(':');const se=it.seasons.find(x=>x.n===+sn&&!x.sp);
-      const m=cache['s'+it.id];const sc=m&&m.id?cache['se'+m.id+'_'+sn]:null;
-      const local=(EPNAMES[it.tvdb?String(it.tvdb):it.t]||{})[String(sn)]||null;
-      const nums=local?local.map(e=>e[0]):(sc?sc.eps.map(e=>e[0]):Array.from({length:se.total},(_,i)=>i+1));
-      const on=!epWatched(se,+en);setEp(se,+en,on,nums);if(on)it.l=today();save();render()});
-  }
 }
-function renderKeepFocus(){const pos=$('#q').selectionStart;render();const qi=$('#q');qi.focus();qi.setSelectionRange(pos,pos)}
+function bindDetail(){
+  const app=$('#app');
+  app.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{view.detail=null;render()});
+  const it=view.detail.item, kind=view.detail.movie?'movies':'series';
+  app.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{it.s=+b.dataset.st;save();render()});
+  app.querySelectorAll('[data-fav]').forEach(b=>b.onclick=()=>{it.f=!it.f;save();render()});
+  app.querySelectorAll('[data-mw]').forEach(b=>b.onclick=()=>{it.w=!it.w;if(it.w)it.l=today();save();render()});
+  app.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(!confirm('Delete "'+it.t+'" from your library?'))return;
+    data[kind]=data[kind].filter(x=>x.id!==it.id);save();view.detail=null;render();toast('Removed')});
+  app.querySelectorAll('[data-season]').forEach(b=>b.onclick=()=>{const n=+b.dataset.season;view.openSeason=view.openSeason===n?null:n;render()});
+  app.querySelectorAll('[data-sall]').forEach(b=>{b.onclick=e=>{e.stopPropagation();
+    const[,sn]=b.dataset.sall.split(':');const se=it.seasons.find(x=>x.n===+sn&&!x.sp);
+    se.w=seasonWatched(se)>=se.total?0:-1;if(se.w===-1)it.l=today();save();render()}});
+  app.querySelectorAll('[data-ep]').forEach(b=>b.onclick=()=>{
+    const[,sn,en]=b.dataset.ep.split(':');const se=it.seasons.find(x=>x.n===+sn&&!x.sp);
+    const m=cache['s'+it.id];const sc=m&&m.id?cache['se'+m.id+'_'+sn]:null;
+    const local=(EPNAMES[it.tvdb?String(it.tvdb):it.t]||{})[String(sn)]||null;
+    const nums=local?local.map(e=>e[0]):(sc?sc.eps.map(e=>e[0]):Array.from({length:se.total},(_,i)=>i+1));
+    const on=!epWatched(se,+en);setEp(se,+en,on,nums);if(on)it.l=today();save();render()});
+}
 
 load();render();
 </script>

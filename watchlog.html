@@ -264,7 +264,13 @@ function render(){
   sl=[...sl].sort(srt); ml=[...ml].sort(srt);
 
   let body='';
-  if(searching)body+='<p class="results">'+(sl.length+ml.length)+' results</p>';
+  let hidden=0;
+  if(searching){
+    const total=sl.length+ml.length;
+    if(sl.length>60){hidden+=sl.length-60;sl=sl.slice(0,60)}
+    if(ml.length>20){hidden+=ml.length-20;ml=ml.slice(0,20)}
+    body+='<p class="results">'+total+' results'+(hidden?' \u00b7 showing first '+(total-hidden)+' \u2014 keep typing to narrow':'')+'</p>';
+  }
   if(!searching&&view.tab===4)body+='<div class="chips">'+[['all','All'],['watched','Watched'],['towatch','To watch']].map(([v,l])=>'<button data-mf="'+v+'" class="'+(view.mfilter===v?'on':'')+'">'+l+'</button>').join('')+'</div>';
   body+=sl.map(seriesRow).join('');
   if(searching&&ml.length&&sl.length)body+='<p class="results">Movies</p>';
@@ -478,7 +484,7 @@ function openAdd(){
 // ---------- events ----------
 function afterRender(){
   const app=$('#app');
-  const qi=$('#q'); if(qi){qi.oninput=()=>{view.q=qi.value;renderKeepFocus()}}
+  const qi=$('#q'); if(qi){qi.oninput=()=>{view.q=qi.value;clearTimeout(window.__qT);window.__qT=setTimeout(renderKeepFocus,180)}}
   if($('#gear'))$('#gear').onclick=()=>openSettings(false);
   if($('#addb'))$('#addb').onclick=openAdd;
   app.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{view.tab=+b.dataset.tab;render()});

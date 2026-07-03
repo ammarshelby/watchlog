@@ -135,11 +135,20 @@ function load(){
     save();
   }
   try{cache=JSON.parse(localStorage.getItem(CKEY))||{}}catch(e){cache={}}
+  let purged=false;
+  for(const k in cache){const v=cache[k];
+    if(k.endsWith('_x')||(v&&typeof v==='object'&&'id'in v&&v.id===0)){delete cache[k];purged=true}}
+  if(purged)saveCache();
   try{settings=JSON.parse(localStorage.getItem(SKEY))||{}}catch(e){settings={}}
   if(!settings.tmdb){settings.tmdb='9af69203edc46b5ed4cb6bf4cce4ac8e';settings.dismissedSetup=1;saveSettings()}
 }
 let saveT; function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(DKEY,JSON.stringify(data))}catch(e){toast('Save failed — storage full?')}},400)}
-let cacheT; function saveCache(){clearTimeout(cacheT);cacheT=setTimeout(()=>{try{localStorage.setItem(CKEY,JSON.stringify(cache))}catch(e){cache={};}},800)}
+let cacheT, lastCacheSave=0;
+function saveCache(){
+  const write=()=>{lastCacheSave=Date.now();try{localStorage.setItem(CKEY,JSON.stringify(cache))}catch(e){cache={}}};
+  if(Date.now()-lastCacheSave>3000){clearTimeout(cacheT);write()}
+  else{clearTimeout(cacheT);cacheT=setTimeout(write,800)}
+}
 function saveSettings(){localStorage.setItem(SKEY,JSON.stringify(settings))}
 
 // season helpers: w is -1 (all), 0 (none) or array of watched ep numbers
@@ -155,6 +164,8 @@ function setEp(se,n,on,epNums){
 
 // ---------- TMDB / OMDb ----------
 const q=[]; let busy=false;
+const pending=new Set(), failed=new Set();
+function cleanTitle(t){const m=t.match(/^(.*?)\s*\((\d{4})\)\s*$/);return m?{q:m[1],y:m[2]}:{q:t,y:''}}
 function enqueue(fn){q.push(fn);pump()}
 async function pump(){if(busy||!q.length)return;busy=true;const fn=q.shift();try{await fn()}catch(e){}
   setTimeout(()=>{busy=false;pump()},120)}
@@ -167,25 +178,34 @@ function metaFor(item,isMovie){
   const key=(isMovie?'m':'s')+item.id;
   return cache[key];
 }
-function requestMeta(item,isMovie){
+function requestMeta(item,isMovie,attempt){
   const key=(isMovie?'m':'s')+item.id;
-  if(cache[key]||cache[key+'_x']||!settings.tmdb)return;
-  cache[key+'_x']=1;
+  if(cache[key]||pending.has(key)||failed.has(key)||!settings.tmdb)return;
+  pending.add(key);
   enqueue(async()=>{
     try{
       let hit=null;
+      const c=cleanTitle(item.t);
       if(isMovie){
         if(item.imdb){const f=await tmdb('/find/'+item.imdb+'?external_source=imdb_id');hit=(f.movie_results||[])[0]}
-        if(!hit){const s=await tmdb('/search/movie?query='+encodeURIComponent(item.t)+(item.y?'&year='+item.y:''));hit=(s.results||[])[0]}
+        if(!hit){const s=await tmdb('/search/movie?query='+encodeURIComponent(c.q)+((c.y||item.y)?'&year='+(c.y||item.y):''));hit=(s.results||[])[0]}
+        if(!hit&&c.y){const s=await tmdb('/search/movie?query='+encodeURIComponent(c.q));hit=(s.results||[])[0]}
       }else{
         if(item.tvdb){const f=await tmdb('/find/'+item.tvdb+'?external_source=tvdb_id');hit=(f.tv_results||[])[0]}
         if(!hit&&item.imdb){const f=await tmdb('/find/'+item.imdb+'?external_source=imdb_id');hit=(f.tv_results||[])[0]}
-        if(!hit){const s=await tmdb('/search/tv?query='+encodeURIComponent(item.t));hit=(s.results||[])[0]}
+        if(!hit){const s=await tmdb('/search/tv?query='+encodeURIComponent(c.q)+(c.y?'&first_air_date_year='+c.y:''));hit=(s.results||[])[0]}
+        if(!hit&&c.y){const s=await tmdb('/search/tv?query='+encodeURIComponent(c.q));hit=(s.results||[])[0]}
       }
-      cache[key]=hit?{id:hit.id,p:hit.poster_path||'',r:hit.vote_average?+hit.vote_average.toFixed(1):0}:{id:0,p:'',r:0};
-      delete cache[key+'_x'];saveCache();patchRow(key,item,isMovie);
-      if(view.detail&&view.detail.item.id===item.id)render();
-    }catch(e){delete cache[key+'_x']}
+      pending.delete(key);
+      if(hit){cache[key]={id:hit.id,p:hit.poster_path||'',r:hit.vote_average?+hit.vote_average.toFixed(1):0};
+        saveCache();patchRow(key,item,isMovie);
+        if(view.detail&&view.detail.item.id===item.id)render();
+      }else failed.add(key);
+    }catch(e){pending.delete(key);
+      const a=(attempt||0)+1;
+      if(a<=2)setTimeout(()=>requestMeta(item,isMovie,a),2000*a);
+      else failed.add(key);
+    }
   });
 }
 function requestOmdb(item){
@@ -369,35 +389,89 @@ function openSettings(first){
   +'<p>Posters and ratings come from <b>TMDB</b> (free). Create a key at <a href="https://www.themoviedb.org/settings/api" target="_blank">themoviedb.org/settings/api</a> and paste it below. Optional: an <a href="https://www.omdbapi.com/apikey.aspx" target="_blank">OMDb key</a> adds IMDb + Rotten Tomatoes scores.</p>'
   +'<input id="k1" placeholder="TMDB API key" value="'+esc(settings.tmdb||'')+'">'
   +'<input id="k2" placeholder="OMDb API key (optional)" value="'+esc(settings.omdb||'')+'">'
-  +'<div class="acts"><button class="big" id="ksave">Save</button><button id="kexp">Export backup</button><button id="kimp">Import backup</button><button id="kclose">Close</button></div>'
+  +'<div class="acts"><button class="big" id="ksave">Save</button><button id="kexp">Export backup</button><button id="kimp">Import backup</button><button id="kart">Refresh artwork</button><button id="kclose">Close</button></div>'
   +'<input type="file" id="kfile" accept=".json" class="hide"></div>';
   document.body.appendChild(d);
   d.addEventListener('click',e=>{if(e.target===d)d.remove()});
   $('#kclose').onclick=()=>d.remove();
   $('#ksave').onclick=()=>{settings.tmdb=$('#k1').value.trim();settings.omdb=$('#k2').value.trim();saveSettings();d.remove();toast('Saved');render()};
   $('#kexp').onclick=()=>{const b=new Blob([JSON.stringify(data)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='watchlog-backup-'+today()+'.json';a.click()};
+  $('#kart').onclick=()=>{cache={};failed.clear();pending.clear();saveCache();d.remove();toast('Re-fetching posters\u2026');render()};
   $('#kimp').onclick=()=>$('#kfile').click();
   $('#kfile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(j.series&&j.movies){data=j;save();d.remove();toast('Imported');render()}else toast('Not a Watch Log backup')}catch(err){toast('Import failed')}};r.readAsText(f)};
 }
+function closeOvl(){const o=document.getElementById('ovl');if(o)o.remove()}
+async function addFromTmdb(type,id){
+  try{
+    if(type==='tv'){
+      const j=await tmdb('/tv/'+id+'?append_to_response=external_ids');
+      const seasons=(j.seasons||[]).filter(x=>x.season_number>0).map(x=>({n:x.season_number,total:x.episode_count||0,w:0,sp:false}));
+      const it={id:nid(),t:j.name,s:3,f:false,tvdb:(j.external_ids&&j.external_ids.tvdb_id)||0,imdb:(j.external_ids&&j.external_ids.imdb_id)||'',seasons,l:''};
+      cache['s'+it.id]={id:j.id,p:j.poster_path||'',r:j.vote_average?+j.vote_average.toFixed(1):0};saveCache();
+      data.series.unshift(it);view.tab=3;
+    }else{
+      const j=await tmdb('/movie/'+id+'?append_to_response=external_ids');
+      const it={id:nid(),t:j.title,y:j.release_date?+j.release_date.slice(0,4):null,w:false,f:false,imdb:(j.external_ids&&j.external_ids.imdb_id)||j.imdb_id||'',l:''};
+      cache['m'+it.id]={id:j.id,p:j.poster_path||'',r:j.vote_average?+j.vote_average.toFixed(1):0};saveCache();
+      data.movies.unshift(it);view.tab=4;
+    }
+    save();closeOvl();view.q='';toast(type==='tv'?'Added to Watchlist':'Added to Movies');render();
+  }catch(e){toast("Couldn't load details \u2014 try again")}
+}
 function openAdd(){
-  let kind='series',status=3;
   const d=document.createElement('div');d.className='overlay';d.id='ovl';
-  const draw=()=>{d.innerHTML='<div class="sheet"><h2>Add to library</h2>'
-    +'<div class="chips"><button id="ks" class="'+(kind==='series'?'on':'')+'">Show</button><button id="km" class="'+(kind==='movie'?'on':'')+'">Movie</button></div>'
-    +'<input id="at" placeholder="Title">'
-    +(kind==='series'?'<input id="an" placeholder="Total episodes (optional)" inputmode="numeric"><div class="chips">'+STATUS.map((x,i)=>'<button data-as="'+i+'" class="'+(status===i?'on':'')+'">'+x.l+'</button>').join('')+'</div>'
-      :'<input id="ay" placeholder="Year (optional)" inputmode="numeric">')
-    +'<div class="acts"><button class="big" id="ago">Add</button><button id="acl">Cancel</button></div></div>';
-    $('#ks').onclick=()=>{kind='series';draw()};$('#km').onclick=()=>{kind='movie';draw()};
-    d.querySelectorAll('[data-as]').forEach(b=>b.onclick=()=>{status=+b.dataset.as;draw()});
-    $('#acl').onclick=()=>d.remove();
-    $('#ago').onclick=()=>{const t=$('#at').value.trim();if(!t)return;
-      if(kind==='series'){const n=parseInt($('#an').value)||0;
-        data.series.unshift({id:nid(),t,s:status,f:false,tvdb:0,imdb:'',seasons:n?[{n:1,total:n,w:0,sp:false}]:[],l:''});view.tab=status}
-      else{data.movies.unshift({id:nid(),t,y:parseInt($('#ay').value)||null,w:false,f:false,imdb:'',l:''});view.tab=4}
-      save();d.remove();view.q='';toast('Added');render()};
+  const drawSearch=()=>{d.innerHTML='<div class="sheet"><h2>Add to library</h2>'
+    +'<input id="at" placeholder="Search any show or movie\u2026" autocomplete="off">'
+    +'<div class="acts"><button class="big" id="asr">Search</button><button id="acl">Cancel</button></div>'
+    +'<div id="ares"></div>'
+    +'<p style="margin-top:10px"><a href="#" id="aman" style="color:var(--acc)">Can\u2019t find it? Add manually</a></p></div>';
+    const inp=$('#at');inp.focus();
+    inp.onkeydown=e=>{if(e.key==='Enter')doSearch()};
+    $('#asr').onclick=doSearch;$('#acl').onclick=()=>d.remove();
+    $('#aman').onclick=e=>{e.preventDefault();drawManual()};
   };
-  draw();document.body.appendChild(d);
+  async function doSearch(){
+    const qv=$('#at').value.trim();if(!qv)return;
+    if(!settings.tmdb){$('#ares').innerHTML='<p class="results">Add your TMDB key in \u2699\ufe0e settings to search.</p>';return}
+    $('#ares').innerHTML='<p class="results">Searching\u2026</p>';
+    try{
+      const c=cleanTitle(qv);
+      const [tv,mv]=await Promise.all([
+        tmdb('/search/tv?query='+encodeURIComponent(c.q)+(c.y?'&first_air_date_year='+c.y:'')),
+        tmdb('/search/movie?query='+encodeURIComponent(c.q)+(c.y?'&year='+c.y:''))]);
+      const rows=[...(tv.results||[]).slice(0,6).map(r=>({ty:'tv',id:r.id,t:r.name,y:(r.first_air_date||'').slice(0,4),p:r.poster_path,r:r.vote_average})),
+                  ...(mv.results||[]).slice(0,4).map(r=>({ty:'movie',id:r.id,t:r.title,y:(r.release_date||'').slice(0,4),p:r.poster_path,r:r.vote_average}))];
+      if(!rows.length){$('#ares').innerHTML='<p class="results">No results \u2014 check the spelling or add manually below.</p>';return}
+      $('#ares').innerHTML=rows.map(r=>'<button class="row" data-pick="'+r.ty+':'+r.id+'">'
+        +'<div class="poster">'+(r.p?'<img loading="lazy" src="'+IMG+r.p+'" alt="">':'\u25b8')+'</div>'
+        +'<div class="rmid"><div class="rt1">'+esc(r.t)+'</div><div class="rt2">'+(r.ty==='tv'?'Show':'Movie')+(r.y?' \u00b7 '+r.y:'')+(r.r?' \u00b7 \u2605 '+(+r.r).toFixed(1):'')+'</div></div></button>').join('');
+      d.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
+        const[ty,pid]=b.dataset.pick.split(':');
+        b.querySelector('.rt2').textContent='Adding\u2026';
+        addFromTmdb(ty,+pid)});
+    }catch(e){$('#ares').innerHTML='<p class="results">Search failed \u2014 check your connection and try again.</p>'}
+  }
+  function drawManual(){
+    let kind='series',status=3;
+    const draw=()=>{d.innerHTML='<div class="sheet"><h2>Add manually</h2>'
+      +'<div class="chips"><button id="ks" class="'+(kind==='series'?'on':'')+'">Show</button><button id="km" class="'+(kind==='movie'?'on':'')+'">Movie</button></div>'
+      +'<input id="mt" placeholder="Title">'
+      +(kind==='series'?'<input id="mn" placeholder="Total episodes (optional)" inputmode="numeric"><div class="chips">'+STATUS.map((x,i)=>'<button data-as="'+i+'" class="'+(status===i?'on':'')+'">'+x.l+'</button>').join('')+'</div>'
+        :'<input id="my" placeholder="Year (optional)" inputmode="numeric">')
+      +'<div class="acts"><button class="big" id="mgo">Add</button><button id="mcl">Back to search</button></div></div>';
+      $('#ks').onclick=()=>{kind='series';draw()};$('#km').onclick=()=>{kind='movie';draw()};
+      d.querySelectorAll('[data-as]').forEach(b=>b.onclick=()=>{status=+b.dataset.as;draw()});
+      $('#mcl').onclick=drawSearch;
+      $('#mgo').onclick=()=>{const t=$('#mt').value.trim();if(!t)return;
+        if(kind==='series'){const n=parseInt($('#mn').value)||0;
+          data.series.unshift({id:nid(),t,s:status,f:false,tvdb:0,imdb:'',seasons:n?[{n:1,total:n,w:0,sp:false}]:[],l:''});view.tab=status}
+        else{data.movies.unshift({id:nid(),t,y:parseInt($('#my').value)||null,w:false,f:false,imdb:'',l:''});view.tab=4}
+        save();d.remove();view.q='';toast('Added');render()};
+    };
+    draw();
+  }
+  document.body.appendChild(d);
+  drawSearch();
   d.addEventListener('click',e=>{if(e.target===d)d.remove()});
 }
 

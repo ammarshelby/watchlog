@@ -206,7 +206,7 @@ function requestMeta(item,isMovie,attempt){
       if(a<=2)setTimeout(()=>requestMeta(item,isMovie,a),2000*a);
       else failed.add(key);
     }
-  });
+  },true);
 }
 function requestOmdb(item){
   if(!settings.omdb||!item.imdb)return;

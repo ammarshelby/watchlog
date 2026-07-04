@@ -118,9 +118,9 @@ nav button.on,.chips button.on{background:linear-gradient(135deg,#F2B441,#FF9A5B
 .sectlabel::before,.sectlabel::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent)}
 .wn{display:flex;align-items:stretch;background:linear-gradient(165deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.09);border-radius:18px;margin-bottom:10px;overflow:hidden}
 .wnmain{flex:1;display:flex;gap:13px;background:none;border:none;color:var(--txt);text-align:left;padding:0;min-width:0;cursor:pointer}
-.wnimg{width:120px;min-height:100px;background:#231F31;flex-shrink:0;position:relative}
-.wnimg::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,rgba(20,17,31,.55))}
-.wnimg img{width:100%;height:100%;object-fit:cover;display:block}
+.wnimg{width:120px;min-height:100px;align-self:stretch;background:#231F31;flex-shrink:0;position:relative;overflow:hidden}
+.wnimg::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,rgba(20,17,31,.55));z-index:1}
+.wnimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .wninfo{display:flex;flex-direction:column;justify-content:center;gap:5px;padding:12px 0;min-width:0}
 .wnshow{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#B9B3CC;border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:3px 10px;align-self:flex-start;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wnep{font-size:17px;font-weight:800;letter-spacing:.01em}
@@ -209,10 +209,17 @@ function load(){
 }
 let saveT; function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(DKEY,JSON.stringify(data))}catch(e){toast('Save failed — storage full?')}},400)}
 let cacheT, lastCacheSave=0;
+function cacheWrite(){
+  lastCacheSave=Date.now();
+  try{localStorage.setItem(CKEY,JSON.stringify(cache));return}catch(e){}
+  for(const k in cache)if(k.startsWith('se'))delete cache[k];
+  try{localStorage.setItem(CKEY,JSON.stringify(cache));return}catch(e){}
+  for(const k in cache)if(k.startsWith('up'))delete cache[k];
+  try{localStorage.setItem(CKEY,JSON.stringify(cache))}catch(e){}
+}
 function saveCache(){
-  const write=()=>{lastCacheSave=Date.now();try{localStorage.setItem(CKEY,JSON.stringify(cache))}catch(e){cache={}}};
-  if(Date.now()-lastCacheSave>3000){clearTimeout(cacheT);write()}
-  else{clearTimeout(cacheT);cacheT=setTimeout(write,800)}
+  if(Date.now()-lastCacheSave>3000){clearTimeout(cacheT);cacheWrite()}
+  else{clearTimeout(cacheT);cacheT=setTimeout(cacheWrite,800)}
 }
 function saveSettings(){localStorage.setItem(SKEY,JSON.stringify(settings))}
 
@@ -321,11 +328,14 @@ function requestSeasonEps(item,seasonNum){
   return null;
 }
 function patchRow(key,item,isMovie){
-  const el=document.querySelector('[data-p="'+key+'"]');
-  const m=cache[key];
-  if(el&&m&&m.p)el.innerHTML='<img loading="lazy" src="'+IMG+m.p+'" alt="">';
+  const m=cache[key]; if(!m)return;
+  document.querySelectorAll('[data-p="'+key+'"]').forEach(el=>{
+    const wide=el.classList.contains('wnimg');
+    const src=wide?(m.b?'https://image.tmdb.org/t/p/w300'+m.b:(m.p?IMG+m.p:'')):(m.p?IMG+m.p:'');
+    if(src)el.innerHTML='<img loading="lazy" src="'+src+'" alt="">';
+  });
   const rb=document.querySelector('[data-r="'+key+'"]');
-  if(rb&&m&&m.r)rb.textContent='★ '+m.r;
+  if(rb&&m.r)rb.textContent='★ '+m.r;
 }
 
 // ---------- rendering ----------

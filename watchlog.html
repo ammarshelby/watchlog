@@ -202,12 +202,24 @@ function setEp(se,n,on,epNums){
 }
 
 // ---------- TMDB / OMDb ----------
-const q=[]; let busy=false;
+const q=[]; let busy=false; let running=0; const CONC=8;
 const pending=new Set(), failed=new Set();
+let upcLast=0, upcT2;
+function nudgeUpcoming(){
+  if(view.detail||view.nav!=='shows'||view.chip!=='upcoming')return;
+  const n=Date.now();
+  if(n-upcLast>1200){upcLast=n;updateMain()}
+  else{clearTimeout(upcT2);upcT2=setTimeout(()=>{upcLast=Date.now();
+    if(!view.detail&&view.nav==='shows'&&view.chip==='upcoming')updateMain()},1300)}
+}
 function cleanTitle(t){const m=t.match(/^(.*?)\s*\((\d{4})\)\s*$/);return m?{q:m[1],y:m[2]}:{q:t,y:''}}
 function enqueue(fn,front){front?q.unshift(fn):q.push(fn);pump()}
-async function pump(){if(busy||!q.length)return;busy=true;const fn=q.shift();try{await fn()}catch(e){}
-  setTimeout(()=>{busy=false;pump()},70)}
+function pump(){
+  while(running<CONC&&q.length){
+    const fn=q.shift(); running++;
+    Promise.resolve().then(fn).catch(()=>{}).finally(()=>{setTimeout(()=>{running--;pump()},25)});
+  }
+}
 async function tmdb(path){
   if(!settings.tmdb)throw 0;
   const r=await fetch('https://api.themoviedb.org/3'+path+(path.includes('?')?'&':'?')+'api_key='+encodeURIComponent(settings.tmdb));
@@ -239,12 +251,14 @@ function requestMeta(item,isMovie,attempt){
       if(hit){cache[key]={id:hit.id,p:hit.poster_path||'',b:hit.backdrop_path||'',r:hit.vote_average?+hit.vote_average.toFixed(1):0};
         saveCache();patchRow(key,item,isMovie);
         if(view.detail&&view.detail.item.id===item.id)render();
-        else if(!view.detail&&view.nav==='shows'&&view.chip==='upcoming')updateMain();
-      }else failed.add(key);
+        else nudgeUpcoming();
+      }else{failed.add(key);
+        nudgeUpcoming();}
     }catch(e){pending.delete(key);
       const a=(attempt||0)+1;
       if(a<=2)setTimeout(()=>requestMeta(item,isMovie,a),2000*a);
-      else failed.add(key);
+      else{failed.add(key);
+        nudgeUpcoming();}
     }
   },true);
 }
@@ -303,14 +317,15 @@ function nextEp(s){
 function requestUpcoming(s){
   const m=cache['s'+s.id]; if(!m||!m.id||!settings.tmdb)return;
   const key='up'+s.id, t=today();
-  const c=cache[key]; if(c&&c.f===t)return;
+  const c=cache[key];
+  if(c&&c.f){const age=(new Date(t)-new Date(c.f))/864e5; if(age<(c.air?1:3))return;}
   if(pending.has(key))return; pending.add(key);
   enqueue(async()=>{try{
     const j=await tmdb('/tv/'+m.id);
     const n=j.next_episode_to_air;
     cache[key]={f:t,air:n&&n.air_date?{d:n.air_date,sn:n.season_number,en:n.episode_number,nm:n.name||''}:null};
     pending.delete(key);saveCache();
-    if(!view.detail&&view.nav==='shows'&&view.chip==='upcoming')updateMain();
+    nudgeUpcoming();
   }catch(e){pending.delete(key)}},true);
 }
 function upcomingCard(x){
@@ -404,10 +419,10 @@ function mainBody(){
     cand.forEach(s=>{if(!cache['s'+s.id])requestMeta(s,false);requestUpcoming(s)});
     const items=cand.map(s=>({s,u:(cache['up'+s.id]||{}).air})).filter(x=>x.u&&x.u.d&&x.u.d>=today())
       .sort((a,b)=>a.u.d.localeCompare(b.u.d));
-    const done=cand.filter(s=>{const c=cache['up'+s.id];return c&&c.f===today()}).length;
-    if(done<cand.length)body+='<p class="results">Checking air dates for your shows\u2026 '+done+'/'+cand.length+'</p>';
+    const never=cand.filter(s=>!cache['up'+s.id]&&!failed.has('s'+s.id)).length;
+    if(never)body+='<p class="results">Checking air dates\u2026 '+(cand.length-never)+'/'+cand.length+'</p>';
     body+=items.map(upcomingCard).join('');
-    if(!items.length&&done>=cand.length)body+='<p class="empty">No upcoming episodes announced yet for the shows you follow.</p>';
+    if(!items.length&&!never)body+='<p class="empty">No upcoming episodes announced yet for the shows you follow.</p>';
   }else{
     const st={up:1,stopped:2,wl:3}[view.chip];
     let sl=data.series.filter(s=>s.s===st).sort((a,b)=>(b.l||'').localeCompare(a.l||'')||a.t.localeCompare(b.t));

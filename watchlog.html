@@ -134,6 +134,32 @@ nav button.on,.chips button.on{background:linear-gradient(135deg,#F2B441,#FF9A5B
 .bottomnav button.on{color:#F2B441;background:rgba(242,180,65,.12)}
 .bottomnav svg{width:22px;height:22px}
 body.searching .bottomnav{display:none}
+.calbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(165deg,rgba(255,255,255,.055),rgba(255,255,255,.018));border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:8px 10px;margin:4px 0 12px}
+.calbar span{font-size:13.5px;font-weight:600}
+.calbar button{width:40px;height:36px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--txt);font-size:20px;line-height:1}
+.calday{font-size:15px;font-weight:800;margin:16px 2px 8px;letter-spacing:-.01em}
+.pf{background:linear-gradient(165deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.09);border-radius:18px;overflow:hidden;margin:4px 0 6px}
+.pfbanner{height:120px;background:linear-gradient(135deg,#241d3e,#3a2c14);position:relative}
+.pfbanner img{width:100%;height:100%;object-fit:cover;display:block}
+.pfgrad{position:absolute;inset:0;background:linear-gradient(rgba(15,13,22,0) 30%,rgba(20,17,31,.92))}
+.pfrow{display:flex;align-items:center;gap:12px;padding:0 14px 6px;margin-top:-26px;position:relative}
+.pfav{width:58px;height:58px;border-radius:50%;background:#191625;border:2px solid rgba(242,180,65,.6);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 0 18px rgba(242,180,65,.25);flex-shrink:0}
+.pfid{flex:1;min-width:0}
+.pfhi{color:#C9C3DB;font-size:13px}
+.pfname{font-size:19px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pfedit{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:var(--txt);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600}
+.pflevel{display:flex;gap:12px;align-items:center;padding:12px 14px 14px}
+.pfstar{font-size:30px}
+.pflmid{flex:1}
+.pflmid b{font-size:15px}
+.pfnext{display:block;color:var(--mut);font-size:11px;margin-top:4px}
+.emogrid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.emogrid button{font-size:22px;padding:8px 0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px}
+.emogrid button.on{border-color:var(--acc);background:rgba(242,180,65,.15)}
+.bstrip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.bstrip button{flex-shrink:0;width:110px;height:62px;border-radius:10px;overflow:hidden;border:2px solid transparent;padding:0;background:#231F31}
+.bstrip button.on{border-color:var(--acc)}
+.bstrip img{width:100%;height:100%;object-fit:cover;display:block}
 .wndate{display:flex;align-items:center;padding:0 16px;flex-shrink:0}
 .wndate b{font-size:12px;font-weight:700;color:#F2B441;background:rgba(242,180,65,.13);border:1px solid rgba(242,180,65,.3);border-radius:999px;padding:6px 11px;white-space:nowrap}
 .bottomnav button{font-size:10px}
@@ -163,7 +189,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 
 // ---------- state ----------
 let data, cache, settings;
-let view={nav:'shows',chip:'next',tab:0,q:'',mfilter:'all',detail:null,openSeason:null};
+let view={nav:'shows',chip:'next',tab:0,q:'',mfilter:'all',detail:null,openSeason:null,calOff:0};
 
 function load(){
   try{data=JSON.parse(localStorage.getItem(DKEY))||null}catch(e){data=null}
@@ -206,7 +232,9 @@ const q=[]; let busy=false; let running=0; const CONC=8;
 const pending=new Set(), failed=new Set();
 let upcLast=0, upcT2;
 function nudgeUpcoming(){
-  if(view.detail||view.nav!=='shows'||view.chip!=='upcoming')return;
+  if(view.detail)return;
+  const on=(view.nav==='shows'&&view.chip==='upcoming')||view.nav==='calendar';
+  if(!on)return;
   const n=Date.now();
   if(n-upcLast>1200){upcLast=n;updateMain()}
   else{clearTimeout(upcT2);upcT2=setTimeout(()=>{upcLast=Date.now();
@@ -318,12 +346,13 @@ function requestUpcoming(s){
   const m=cache['s'+s.id]; if(!m||!m.id||!settings.tmdb)return;
   const key='up'+s.id, t=today();
   const c=cache[key];
-  if(c&&c.f){const age=(new Date(t)-new Date(c.f))/864e5; if(age<(c.air?1:3))return;}
+  if(c&&c.f&&('last' in c)){const age=(new Date(t)-new Date(c.f))/864e5; if(age<(c.air?1:3))return;}
   if(pending.has(key))return; pending.add(key);
   enqueue(async()=>{try{
     const j=await tmdb('/tv/'+m.id);
-    const n=j.next_episode_to_air;
-    cache[key]={f:t,air:n&&n.air_date?{d:n.air_date,sn:n.season_number,en:n.episode_number,nm:n.name||''}:null};
+    const n=j.next_episode_to_air, L=j.last_episode_to_air;
+    cache[key]={f:t,air:n&&n.air_date?{d:n.air_date,sn:n.season_number,en:n.episode_number,nm:n.name||''}:null,
+      last:L&&L.air_date?{d:L.air_date,sn:L.season_number,en:L.episode_number,nm:L.name||''}:null};
     pending.delete(key);saveCache();
     nudgeUpcoming();
   }catch(e){pending.delete(key)}},true);
@@ -364,10 +393,11 @@ function headerHTML(){
 function navHTML(){
   const ic={
     shows:'<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 2.5l4 3.5 4-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    upcoming:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    calendar:'<svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 2.8V6M16 2.8V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8.5" cy="14" r="1.3" fill="currentColor"/><circle cx="12" cy="14" r="1.3" fill="currentColor"/><circle cx="15.5" cy="14" r="1.3" fill="currentColor"/></svg>',
     movies:'<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="8" width="18" height="12" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 8L20 4.5l.7 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7 7l2.5 3M12 6l2.5 3M17 5l2.5 3" stroke="currentColor" stroke-width="1.4"/></svg>',
-    upcoming:'<svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 2.8V6M16 2.8V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="15" r="1.6" fill="currentColor"/></svg>',
-    stats:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 20V12M12 20V5M19 20v-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'};
-  return '<nav class="bottomnav">'+[['shows','Shows'],['upcoming','Upcoming'],['movies','Movies'],['stats','Stats']].map(([id,l])=>
+    profile:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.8" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20.5c1.4-3.6 4.2-5.4 7.5-5.4s6.1 1.8 7.5 5.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'};
+  return '<nav class="bottomnav">'+[['shows','Shows'],['upcoming','Upcoming'],['calendar','Calendar'],['movies','Movies'],['profile','Profile']].map(([id,l])=>
     '<button data-nav="'+id+'" class="'+(view.nav===id?'on':'')+'">'+ic[id]+'<span>'+l+'</span></button>').join('')+'</nav>';
 }
 function mainBody(){
@@ -387,10 +417,63 @@ function mainBody(){
     if(total===0)body+='<p class="empty">Not in your library. Tap + Add to search all of TMDB for \u201c'+esc(view.q.trim())+'\u201d.</p>';
     return body;
   }
-  if(view.nav==='stats'){
-    const eps=data.series.reduce((a,s)=>a+showWatched(s),0);
+  if(view.nav==='calendar'){
+    const cands=data.series.filter(s=>s.s===0||s.s===1);
+    const addD=(d,n)=>{const x=new Date(d+'T12:00:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
+    const start=addD(today(),view.calOff*7), end=addD(start,6);
+    const fmtD=d=>new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    let checking=0; const eps=[];
+    for(const s of cands){
+      if(!cache['s'+s.id])requestMeta(s,false);
+      const u=cache['up'+s.id];
+      if(!u){checking++;requestUpcoming(s);continue}
+      requestUpcoming(s);
+      for(const e of [u.air,u.last])if(e&&e.d>=start&&e.d<=end)eps.push({s,e});
+    }
+    eps.sort((a,b)=>a.e.d.localeCompare(b.e.d)||a.s.t.localeCompare(b.s.t));
+    let body='<div class="calbar"><button data-calprev aria-label="Previous week">\u2039</button>'
+      +'<span class="mono">'+fmtD(start)+' \u2013 '+fmtD(end)+'</span>'
+      +'<button data-calnext aria-label="Next week">\u203a</button></div>';
+    if(checking)body+='<p class="results">Checking air dates\u2026 '+(cands.length-checking)+'/'+cands.length+'</p>';
+    const now=today(), tom=addD(now,1);
+    let lastDate='';
+    for(const x of eps){
+      if(x.e.d!==lastDate){lastDate=x.e.d;
+        const dt=new Date(x.e.d+'T12:00:00');
+        const wd=x.e.d===now?'Today':(x.e.d===tom?'Tomorrow':dt.toLocaleDateString('en-GB',{weekday:'long'}));
+        body+='<p class="calday">'+wd+', '+fmtD(x.e.d)+'</p>';}
+      const key='s'+x.s.id, m=cache[key];
+      const img=m&&(m.b||m.p)?(m.b?'https://image.tmdb.org/t/p/w300'+m.b:IMG+m.p):'';
+      body+='<div class="wn"><button class="wnmain" data-open="s:'+x.s.id+'">'
+      +'<div class="wnimg" data-p="'+key+'">'+(img?'<img loading="lazy" src="'+img+'" alt="">':'')+'</div>'
+      +'<div class="wninfo"><span class="wnshow">'+esc(x.s.t)+'</span>'
+      +'<span class="wnep mono">S'+String(x.e.sn).padStart(2,'0')+' | E'+String(x.e.en).padStart(2,'0')+'</span>'
+      +(x.e.nm?'<span class="wnname">'+esc(x.e.nm)+'</span>':'')
+      +'</div></button></div>';
+    }
+    if(!eps.length&&!checking)body+='<p class="empty">Nothing airing this week from the shows you follow.</p>';
+    return body;
+  }
+  if(view.nav==='profile'||view.nav==='stats'){
+    const p=settings.profile||{};
+    const eps=data.series.reduce((a,s)=>a+s.seasons.reduce((b,se)=>b+seasonWatched(se),0),0);
     const mw=data.movies.filter(m=>m.w).length;
-    return statsView(eps,mw);
+    const lvl=Math.max(1,Math.floor(Math.sqrt(eps/34)));
+    const names=['Newbie','Casual','Watcher','Regular','Fan','Binger','Devoted','Enthusiast','Buff','Cinephile','Critic','Curator','Collector','Chronicler','Archivist','Historian','Scholar','Sage','Virtuoso','Veteran','Ace','Elite','Master','Grandmaster','Legend','Mythic','Immortal'];
+    const title=names[Math.min(lvl,names.length-1)];
+    const nextAt=34*(lvl+1)*(lvl+1), curAt=34*lvl*lvl;
+    const pct=Math.min(100,Math.round((eps-curAt)/(nextAt-curAt)*100));
+    const h=new Date().getHours();
+    const greet=h<12?'Good morning':(h<17?'Good afternoon':'Good evening');
+    const banner=p.bannerPath?'<img src="https://image.tmdb.org/t/p/w780'+esc(p.bannerPath)+'" alt="">':'';
+    return '<div class="pf"><div class="pfbanner">'+banner+'<div class="pfgrad"></div></div>'
+    +'<div class="pfrow"><div class="pfav">'+esc(p.emoji||'\ud83c\udf7f')+'</div>'
+    +'<div class="pfid"><div class="pfhi">'+greet+' \ud83d\udc4b</div><div class="pfname">'+esc(p.name||'Tap Edit to set your name')+'</div></div>'
+    +'<button class="pfedit" data-editprofile>Edit</button></div>'
+    +'<div class="pflevel"><span class="pfstar">\ud83e\udd29</span><div class="pflmid"><b>Level '+lvl+': '+title+'</b>'
+    +'<div class="prog" style="margin-top:6px"><i style="width:'+pct+'%;background:var(--acc)"></i></div>'
+    +'<span class="pfnext mono">'+fmt(Math.max(0,nextAt-eps))+' eps to level '+(lvl+1)+'</span></div></div></div>'
+    +'<p class="sectlabel">Stats</p>'+statsView(data.series.reduce((a,s)=>a+showWatched(s),0),mw);
   }
   if(view.nav==='movies'){
     let ml=data.movies;
@@ -581,6 +664,31 @@ async function addFromTmdb(type,id){
     save();closeOvl();view.q='';toast(type==='tv'?'Added to Watchlist':'Added to Movies');render();
   }catch(e){toast("Couldn't load details \u2014 try again")}
 }
+function openEditProfile(){
+  const p=Object.assign({name:'',emoji:'\ud83c\udf7f',bannerPath:''},settings.profile||{});
+  const EMO=['\ud83c\udf7f','\ud83c\udfac','\ud83d\udcfa','\ud83d\udc7e','\ud83e\udd16','\u2b50','\ud83c\udf1f','\ud83d\udd25','\ud83e\udd8a','\ud83d\udc3c','\ud83e\udd81','\ud83d\udc31','\ud83d\udc36','\ud83e\udd89','\ud83d\udc28','\ud83d\udc30'];
+  const favs=data.series.filter(s=>s.f);
+  favs.forEach(s=>requestMeta(s,false));
+  const d=document.createElement('div');d.className='overlay';d.id='ovl';
+  const banners=favs.map(s=>{const m=cache['s'+s.id];return m&&m.b?{t:s.t,b:m.b}:null}).filter(Boolean).slice(0,12);
+  d.innerHTML='<div class="sheet"><h2>Edit profile</h2>'
+  +'<input id="pn" placeholder="Your name" value="'+esc(p.name)+'" maxlength="24">'
+  +'<p style="margin-bottom:6px">Avatar</p><div class="emogrid">'+EMO.map(e=>'<button data-em="'+e+'" class="'+(p.emoji===e?'on':'')+'">'+e+'</button>').join('')+'</div>'
+  +'<p style="margin:10px 0 6px">Banner (from your favorite shows)</p>'
+  +(banners.length?'<div class="bstrip">'+banners.map(x=>'<button data-bp="'+esc(x.b)+'" class="'+(p.bannerPath===x.b?'on':'')+'" title="'+esc(x.t)+'"><img src="'+IMG+x.b+'" alt=""></button>').join('')+'</div>'
+    :'<p style="color:var(--mut);font-size:13px">Mark some shows as \u2605 favorites and their artwork will appear here.</p>')
+  +'<div class="acts" style="margin-top:12px"><button class="big" id="psave">Save</button><button id="pcancel">Cancel</button></div></div>';
+  document.body.appendChild(d);
+  let sel={...p};
+  d.querySelectorAll('[data-em]').forEach(b=>b.onclick=()=>{sel.emoji=b.dataset.em;
+    d.querySelectorAll('[data-em]').forEach(x=>x.classList.toggle('on',x===b))});
+  d.querySelectorAll('[data-bp]').forEach(b=>b.onclick=()=>{sel.bannerPath=b.dataset.bp;
+    d.querySelectorAll('[data-bp]').forEach(x=>x.classList.toggle('on',x===b))});
+  d.querySelector('#pcancel').onclick=()=>d.remove();
+  d.querySelector('#psave').onclick=()=>{sel.name=d.querySelector('#pn').value.trim();
+    settings.profile=sel;saveSettings();d.remove();toast('Profile saved');updateMain()};
+  d.addEventListener('click',e=>{if(e.target===d)d.remove()});
+}
 function openAdd(){
   const d=document.createElement('div');d.className='overlay';d.id='ovl';
   const drawSearch=()=>{d.innerHTML='<div class="sheet"><h2>Add to library</h2>'
@@ -657,6 +765,9 @@ function bindMain(){
   const main=document.querySelector('#app main'); if(!main)return;
   main.querySelectorAll('[data-mf]').forEach(b=>b.onclick=()=>{view.mfilter=b.dataset.mf;updateMain()});
   main.querySelectorAll('[data-chip]').forEach(b=>b.onclick=()=>{view.chip=b.dataset.chip;updateMain()});
+  main.querySelectorAll('[data-calprev]').forEach(b=>b.onclick=()=>{view.calOff--;updateMain()});
+  main.querySelectorAll('[data-calnext]').forEach(b=>b.onclick=()=>{view.calOff++;updateMain()});
+  main.querySelectorAll('[data-editprofile]').forEach(b=>b.onclick=openEditProfile);
   main.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const[k,id]=b.dataset.open.split(':');
     const item=(k==='s'?data.series:data.movies).find(x=>x.id===id);
     view.detail={item,movie:k==='m'};view.openSeason=null;window.scrollTo(0,0);render()});

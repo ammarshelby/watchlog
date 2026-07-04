@@ -191,7 +191,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 let data, cache, settings;
 let view={nav:'shows',chip:'next',tab:0,q:'',mfilter:'all',detail:null,openSeason:null,calOff:0};
 
-function load(){
+async function load(){
   try{data=JSON.parse(localStorage.getItem(DKEY))||null}catch(e){data=null}
   if(!data){
     data={series:SEED.series.map(r=>({id:nid(),t:r[0],s:r[1],f:!!r[2],tvdb:r[3],imdb:r[4],
@@ -199,7 +199,18 @@ function load(){
       movies:SEED.movies.map(r=>({id:nid(),t:r[0],y:r[1]||null,w:!!r[2],f:!!r[3],imdb:r[4],l:r[5]}))};
     save();
   }
-  try{cache=JSON.parse(localStorage.getItem(CKEY))||{}}catch(e){cache={}}
+  idbOK=await idbOpen();
+  cache={};
+  if(idbOK){
+    try{cache=JSON.parse(await idbGet('cache')||'{}')||{}}catch(e){cache={}}
+  }
+  if(!Object.keys(cache).length){
+    try{cache=JSON.parse(localStorage.getItem(CKEY))||{}}catch(e){cache={}}
+    if(idbOK&&Object.keys(cache).length){
+      idbSet('cache',JSON.stringify(cache));
+      try{localStorage.removeItem(CKEY)}catch(e){}
+    }
+  }
   let purged=false;
   for(const k in cache){const v=cache[k];
     if(k.endsWith('_x')||(v&&typeof v==='object'&&'id'in v&&v.id===0)){delete cache[k];purged=true}}
@@ -208,9 +219,26 @@ function load(){
   if(!settings.tmdb){settings.tmdb='9af69203edc46b5ed4cb6bf4cce4ac8e';settings.dismissedSetup=1;saveSettings()}
 }
 let saveT; function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(DKEY,JSON.stringify(data))}catch(e){toast('Save failed — storage full?')}},400)}
+let idbOK=false, idbDB=null;
+function idbOpen(){return new Promise(res=>{
+  if(!window.indexedDB)return res(false);
+  try{const r=indexedDB.open('eppy-cache',1);
+    r.onupgradeneeded=()=>{r.result.createObjectStore('kv')};
+    r.onsuccess=()=>{idbDB=r.result;res(true)};
+    r.onerror=()=>res(false);
+  }catch(e){res(false)}});}
+function idbGet(k){return new Promise(res=>{try{
+  const t=idbDB.transaction('kv').objectStore('kv').get(k);
+  t.onsuccess=()=>res(t.result||null);t.onerror=()=>res(null);
+}catch(e){res(null)}})}
+function idbSet(k,v){return new Promise(res=>{try{
+  const t=idbDB.transaction('kv','readwrite').objectStore('kv').put(v,k);
+  t.onsuccess=()=>res(true);t.onerror=()=>res(false);
+}catch(e){res(false)}})}
 let cacheT, lastCacheSave=0;
 function cacheWrite(){
   lastCacheSave=Date.now();
+  if(idbOK){idbSet('cache',JSON.stringify(cache));return}
   try{localStorage.setItem(CKEY,JSON.stringify(cache));return}catch(e){}
   for(const k in cache)if(k.startsWith('se'))delete cache[k];
   try{localStorage.setItem(CKEY,JSON.stringify(cache));return}catch(e){}
@@ -652,7 +680,7 @@ function openSettings(first){
   $('#kclose').onclick=()=>d.remove();
   $('#ksave').onclick=()=>{settings.tmdb=$('#k1').value.trim();settings.omdb=$('#k2').value.trim();saveSettings();d.remove();toast('Saved');render()};
   $('#kexp').onclick=()=>{const b=new Blob([JSON.stringify(data)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='watchlog-backup-'+today()+'.json';a.click()};
-  $('#kart').onclick=()=>{cache={};failed.clear();pending.clear();saveCache();d.remove();toast('Re-fetching posters\u2026');render()};
+  $('#kart').onclick=()=>{for(const k in cache)if(/^[sm]i/.test(k))delete cache[k];failed.clear();pending.clear();saveCache();d.remove();toast('Re-fetching posters\u2026');render()};
   $('#kimp').onclick=()=>$('#kfile').click();
   $('#kfile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(j.series&&j.movies){data=j;save();d.remove();toast('Imported');render()}else toast('Not a Watch Log backup')}catch(err){toast('Import failed')}};r.readAsText(f)};
 }
@@ -813,7 +841,7 @@ function bindDetail(){
     const on=!epWatched(se,+en);setEp(se,+en,on,nums);if(on)it.l=today();save();render()});
 }
 
-load();render();
+load().then(render);
 </script>
 </body>
 </html>

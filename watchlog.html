@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Watch Log</title>
+<title>Marquee</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Watch Log">
+<meta name="apple-mobile-web-app-title" content="Marquee">
 <meta name="theme-color" content="#0F0D16">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEO0lEQVR4nO3dvU7lMBCGYZ8VLaKjgpqCK6LdC6Pliiio2QvZYhA6iHz584ydeN6nRGg3cl7GTnR2udzd3hdgyp/eF4DjIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAHppvcFlM+3596XcFyPL+8d//ZLlw8YE8QO7UNpHQdZVGqZSLs4yMJRm0RaxEEWQaITCX9aoYw40WsbOzlWXv3T339x13BeH68Pa74tbn5ExbGYBUFsshhKRCIhccyXQRa7zSfi3od/HDNlkIWLmUR8+2j3+pwyvDRbSec41NigDF9qPX2fXzy3lckrI4tQk1uM1+biNjl4n3EcXvci9szB2IgWusI+cbChdDS5zi7DI2pyUEZLQavtEAenjWOqvy8hk4Ox0V7EmtfGwdg4ssq74z85GBu9uK88nz6HRByQquLgwHF8NffIeXJw4OjLd/3ZViARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IA8ax8j/EwaIB4yilfLw+kEi9MeMw9FFp5DgKI6TO4HEYEtknRRyGRLZKFIehj/XSxVEYIatljMOQyKK8cRgSmZE9DkMfk4jjCyPkN+L4gUSuEccEEjHEIdEHccxJPkKIY1naRIhjrYR9EMcG2UYIcWyWJxHi2ClDIsRRZew+iKPWwCOEOHwMmQhxeBosEeLwN0wfxBFijBFCHIHOnghxhDtvIsTRyBn7II52TjdCbnpfQCKn+30jTI5GTldGYXI0cMYsDHEEOm8WhjhCnD0Lw5nD3xhlFCaHr2GyMMThY7AsDHHUGjILw5mjysBlFCbHbmNnYYhjswxZGOLYIE8WhjPHWtnKKEyONRJmYYhjTtosDNuKlLyMwuSYRBaGOH4gi2vE8YUsfuPMUQplCNknB1nMyBsHWSzKGAdZrJTuzEEZ6yWaHGSxVYo4yGKfweMgixojnzkoo9KYk4MsXAw4OSjDy4BxwAtxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oDkHMe5fmXEeHzXvyqOx5d3r+tAkJp7xLYCiTgg+cfBsaMX95WvjYNjx5FV3p2QbYXh0V7EmjvEwfA4pvr7EnUgZXi0FLTaPnFMRkofbUyus8s4j32UpY9ooSvsFgcnj+PwuheXu9t7lz/IfL49T36df7/qTs0Mx59S521FXRn7i68GZZSWr8/pw0uzlXTeVozaXAxbzG7zWbgf+0LiKEt9FBLZaHFaRDwQRMVhFhMxhDJp5fYR95wYG0dZ3Qf2CX2DEH4g5f1HnOi1DZ8c3xghjtr8yLWLw5BIpZaTuHUchkR2aL9B94njGqHM6Hti6x8HDotPn0MiDkjEAYk4IBEHJOKARByQiAMScUAiDkjEAYk4IBEHJOKARByQiAMScUAiDkj/AbvnMxyFhogMAAAAAElFTkSuQmCC">
 <style>
@@ -106,6 +106,44 @@ button.row{cursor:pointer}
 .toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--acc);color:#1A1408;font-weight:700;font-size:13px;padding:9px 16px;border-radius:999px;z-index:40}
 .hide{display:none!important}
 button{cursor:pointer;font-family:inherit}
+
+body{background:radial-gradient(1100px 520px at 50% -12%, #201a38 0%, #0F0D16 58%) fixed, #0F0D16;padding-bottom:110px}
+h1{background:linear-gradient(92deg,#F2B441 20%,#FF8A5B 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.row,.season,.stat,.dist,.sheet{background:linear-gradient(165deg,rgba(255,255,255,.055),rgba(255,255,255,.018));border-color:rgba(255,255,255,.09)}
+.srow input{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.1)}
+.addb{background:linear-gradient(135deg,#F2B441,#FF9A5B);box-shadow:0 4px 18px rgba(242,180,65,.28)}
+nav button.on,.chips button.on{background:linear-gradient(135deg,#F2B441,#FF9A5B);border-color:transparent;box-shadow:0 3px 14px rgba(242,180,65,.3)}
+.chips button em{font-style:normal;font-size:11px;opacity:.65;margin-left:2px}
+.sectlabel{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);text-align:center;margin:16px 0 10px;display:flex;align-items:center;gap:12px}
+.sectlabel::before,.sectlabel::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent)}
+.wn{display:flex;align-items:stretch;background:linear-gradient(165deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.09);border-radius:18px;margin-bottom:10px;overflow:hidden}
+.wnmain{flex:1;display:flex;gap:13px;background:none;border:none;color:var(--txt);text-align:left;padding:0;min-width:0;cursor:pointer}
+.wnimg{width:120px;min-height:100px;background:#231F31;flex-shrink:0;position:relative}
+.wnimg::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,rgba(20,17,31,.55))}
+.wnimg img{width:100%;height:100%;object-fit:cover;display:block}
+.wninfo{display:flex;flex-direction:column;justify-content:center;gap:5px;padding:12px 0;min-width:0}
+.wnshow{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#B9B3CC;border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:3px 10px;align-self:flex-start;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wnep{font-size:17px;font-weight:800;letter-spacing:.01em}
+.wnep em{font-style:normal;color:var(--mut);font-size:12px;font-weight:600}
+.wnname{color:#C9C3DB;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:6px}
+.wncheck{width:66px;border:none;background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.wncheck svg{width:44px;height:44px;padding:12px;border-radius:50%;background:linear-gradient(135deg,#F2B441,#FF9A5B);color:#1A1408;box-shadow:0 0 20px rgba(242,180,65,.35);transition:transform .12s}
+.wncheck:active svg{transform:scale(.86)}
+.bottomnav{position:fixed;left:14px;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));display:flex;background:rgba(19,16,30,.78);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:7px;z-index:6;max-width:520px;margin:0 auto;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.bottomnav button{flex:1;background:none;border:none;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;padding:8px 0;border-radius:17px;cursor:pointer}
+.bottomnav button.on{color:#F2B441;background:rgba(242,180,65,.12)}
+.bottomnav svg{width:22px;height:22px}
+body.searching .bottomnav{display:none}
+.wndate{display:flex;align-items:center;padding:0 16px;flex-shrink:0}
+.wndate b{font-size:12px;font-weight:700;color:#F2B441;background:rgba(242,180,65,.13);border:1px solid rgba(242,180,65,.3);border-radius:999px;padding:6px 11px;white-space:nowrap}
+.bottomnav button{font-size:10px}
+
+.wndate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0 14px;flex-shrink:0}
+.wndate b{color:#F2B441;font-size:14px;white-space:nowrap}
+.wndate span{color:var(--mut);font-size:10.5px}
+.chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex-shrink:0}
 </style>
 </head>
 <body>
@@ -125,7 +163,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 
 // ---------- state ----------
 let data, cache, settings;
-let view={tab:0,q:'',mfilter:'all',detail:null,openSeason:null};
+let view={nav:'shows',chip:'next',tab:0,q:'',mfilter:'all',detail:null,openSeason:null};
 
 function load(){
   try{data=JSON.parse(localStorage.getItem(DKEY))||null}catch(e){data=null}
@@ -167,9 +205,9 @@ function setEp(se,n,on,epNums){
 const q=[]; let busy=false;
 const pending=new Set(), failed=new Set();
 function cleanTitle(t){const m=t.match(/^(.*?)\s*\((\d{4})\)\s*$/);return m?{q:m[1],y:m[2]}:{q:t,y:''}}
-function enqueue(fn){q.push(fn);pump()}
+function enqueue(fn,front){front?q.unshift(fn):q.push(fn);pump()}
 async function pump(){if(busy||!q.length)return;busy=true;const fn=q.shift();try{await fn()}catch(e){}
-  setTimeout(()=>{busy=false;pump()},120)}
+  setTimeout(()=>{busy=false;pump()},70)}
 async function tmdb(path){
   if(!settings.tmdb)throw 0;
   const r=await fetch('https://api.themoviedb.org/3'+path+(path.includes('?')?'&':'?')+'api_key='+encodeURIComponent(settings.tmdb));
@@ -198,9 +236,10 @@ function requestMeta(item,isMovie,attempt){
         if(!hit&&c.y){const s=await tmdb('/search/tv?query='+encodeURIComponent(c.q));hit=(s.results||[])[0]}
       }
       pending.delete(key);
-      if(hit){cache[key]={id:hit.id,p:hit.poster_path||'',r:hit.vote_average?+hit.vote_average.toFixed(1):0};
+      if(hit){cache[key]={id:hit.id,p:hit.poster_path||'',b:hit.backdrop_path||'',r:hit.vote_average?+hit.vote_average.toFixed(1):0};
         saveCache();patchRow(key,item,isMovie);
         if(view.detail&&view.detail.item.id===item.id)render();
+        else if(!view.detail&&view.nav==='shows'&&view.chip==='upcoming')updateMain();
       }else failed.add(key);
     }catch(e){pending.delete(key);
       const a=(attempt||0)+1;
@@ -250,47 +289,131 @@ function patchRow(key,item,isMovie){
 // ---------- rendering ----------
 function toast(msg){let t=$('#toast');if(t)t.remove();t=document.createElement('div');t.id='toast';t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),1900)}
 
+function nextEp(s){
+  const key=s.tvdb?String(s.tvdb):s.t;
+  let remaining=0, first=null;
+  for(const se of s.seasons.filter(x=>!x.sp).sort((a,b)=>a.n-b.n)){
+    const local=(EPNAMES[key]||{})[String(se.n)]||null;
+    const nums=local?local.map(e=>e[0]):Array.from({length:se.total},(_,i)=>i+1);
+    for(const nn of nums){ if(!epWatched(se,nn)){ remaining++;
+      if(!first){const nr=local?local.find(e=>e[0]===nn):null;first={sn:se.n,en:nn,name:nr?nr[1]:''}}}}
+  }
+  return first?Object.assign(first,{remaining}):null;
+}
+function requestUpcoming(s){
+  const m=cache['s'+s.id]; if(!m||!m.id||!settings.tmdb)return;
+  const key='up'+s.id, t=today();
+  const c=cache[key]; if(c&&c.f===t)return;
+  if(pending.has(key))return; pending.add(key);
+  enqueue(async()=>{try{
+    const j=await tmdb('/tv/'+m.id);
+    const n=j.next_episode_to_air;
+    cache[key]={f:t,air:n&&n.air_date?{d:n.air_date,sn:n.season_number,en:n.episode_number,nm:n.name||''}:null};
+    pending.delete(key);saveCache();
+    if(!view.detail&&view.nav==='shows'&&view.chip==='upcoming')updateMain();
+  }catch(e){pending.delete(key)}},true);
+}
+function upcomingCard(x){
+  const s=x.s,u=x.u;
+  const key='s'+s.id,m=cache[key];requestMeta(s,false);
+  const img=m&&(m.b||m.p)?(m.b?'https://image.tmdb.org/t/p/w300'+m.b:IMG+m.p):'';
+  const days=Math.round((new Date(u.d)-new Date(today()))/864e5);
+  const rel=days<=0?'Today':days===1?'Tomorrow':'in '+days+'d';
+  return '<div class="wn"><button class="wnmain" data-open="s:'+s.id+'">'
+  +'<div class="wnimg" data-p="'+key+'">'+(img?'<img loading="lazy" src="'+img+'" alt="">':'')+'</div>'
+  +'<div class="wninfo"><span class="wnshow">'+esc(s.t)+'</span>'
+  +'<span class="wnep mono">S'+String(u.sn).padStart(2,'0')+' | E'+String(u.en).padStart(2,'0')+'</span>'
+  +(u.nm?'<span class="wnname">'+esc(u.nm)+'</span>':'')
+  +'</div></button><div class="wndate"><b>'+rel+'</b><span class="mono">'+u.d+'</span></div></div>';
+}
+function watchNextCard(x){
+  const s=x.s, ne=x.ne;
+  const key='s'+s.id, m=cache[key]; requestMeta(s,false);
+  const img=m&&(m.b||m.p)?(m.b?'https://image.tmdb.org/t/p/w300'+m.b:IMG+m.p):'';
+  return '<div class="wn"><button class="wnmain" data-open="s:'+s.id+'">'
+  +'<div class="wnimg" data-p="'+key+'">'+(img?'<img loading="lazy" src="'+img+'" alt="">':'')+'</div>'
+  +'<div class="wninfo"><span class="wnshow">'+esc(s.t)+'</span>'
+  +'<span class="wnep mono">S'+String(ne.sn).padStart(2,'0')+' | E'+String(ne.en).padStart(2,'0')+(ne.remaining>1?' <em>+'+(ne.remaining-1)+'</em>':'')+'</span>'
+  +(ne.name?'<span class="wnname">'+esc(ne.name)+'</span>':'')
+  +'</div></button>'
+  +'<button class="wncheck" data-wn="'+s.id+'" aria-label="Mark next episode watched"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4 10-10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>';
+}
 function headerHTML(){
   const eps=data.series.reduce((a,s)=>a+showWatched(s),0);
   const mw=data.movies.filter(m=>m.w).length;
-  const counts=STATUS.map((_,i)=>data.series.filter(s=>s.s===i).length);
-  return '<header><div class="brand"><span class="mark">\u25b8</span><h1>Watch Log</h1><span class="tally mono">'+fmt(eps)+' eps \u00b7 '+fmt(mw)+' films</span><button class="gear" id="gear" aria-label="Settings">\u2699\ufe0e</button></div>'
+  return '<header><div class="brand"><span class="mark">\u25b8</span><h1>Marquee</h1><span class="tally mono">'+fmt(eps)+' eps \u00b7 '+fmt(mw)+' films</span><button class="gear" id="gear" aria-label="Settings">\u2699\ufe0e</button></div>'
   +'<div class="srow"><input id="q" placeholder="Search everything\u2026" value="'+esc(view.q)+'" autocomplete="off">'
   +'<button class="clear" id="qclear" style="'+(view.q?'':'display:none')+'">\u2715</button>'
-  +'<button class="addb" id="addb">+ Add</button></div>'
-  +'<nav>'+STATUS.map((st,i)=>'<button data-tab="'+i+'" class="'+(view.tab===i?'on':'')+'">'+st.l+' <em>'+counts[i]+'</em></button>').join('')
-  +'<button data-tab="4" class="'+(view.tab===4?'on':'')+'">Movies <em>'+data.movies.length+'</em></button>'
-  +'<button data-tab="5" class="'+(view.tab===5?'on':'')+'">Stats</button></nav></header>';
+  +'<button class="addb" id="addb">+ Add</button></div></header>';
+}
+function navHTML(){
+  const ic={
+    shows:'<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 2.5l4 3.5 4-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    movies:'<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="8" width="18" height="12" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 8L20 4.5l.7 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7 7l2.5 3M12 6l2.5 3M17 5l2.5 3" stroke="currentColor" stroke-width="1.4"/></svg>',
+    upcoming:'<svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 2.8V6M16 2.8V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="15" r="1.6" fill="currentColor"/></svg>',
+    stats:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 20V12M12 20V5M19 20v-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'};
+  return '<nav class="bottomnav">'+[['shows','Shows'],['upcoming','Upcoming'],['movies','Movies'],['stats','Stats']].map(([id,l])=>
+    '<button data-nav="'+id+'" class="'+(view.nav===id?'on':'')+'">'+ic[id]+'<span>'+l+'</span></button>').join('')+'</nav>';
 }
 function mainBody(){
   const searching=view.q.trim().length>0, ql=view.q.trim().toLowerCase();
-  let sl=[],ml=[];
-  if(searching){sl=data.series.filter(s=>s.t.toLowerCase().includes(ql));ml=data.movies.filter(m=>m.t.toLowerCase().includes(ql))}
-  else if(view.tab<=3)sl=data.series.filter(s=>s.s===view.tab);
-  else if(view.tab===4){ml=data.movies;if(view.mfilter==='watched')ml=ml.filter(m=>m.w);if(view.mfilter==='towatch')ml=ml.filter(m=>!m.w)}
-  const srt=(a,b)=>(b.l||'').localeCompare(a.l||'')||a.t.localeCompare(b.t);
-  sl=[...sl].sort(srt); ml=[...ml].sort(srt);
-
-  let body='';
-  let hidden=0;
   if(searching){
-    const total=sl.length+ml.length;
+    let sl=data.series.filter(s=>s.t.toLowerCase().includes(ql));
+    let ml=data.movies.filter(m=>m.t.toLowerCase().includes(ql));
+    const srt=(a,b)=>(b.l||'').localeCompare(a.l||'')||a.t.localeCompare(b.t);
+    sl=[...sl].sort(srt); ml=[...ml].sort(srt);
+    const total=sl.length+ml.length; let hidden=0;
     if(sl.length>60){hidden+=sl.length-60;sl=sl.slice(0,60)}
     if(ml.length>20){hidden+=ml.length-20;ml=ml.slice(0,20)}
-    body+='<p class="results">'+total+' results'+(hidden?' \u00b7 showing first '+(total-hidden)+' \u2014 keep typing to narrow':'')+'</p>';
+    let body='<p class="results">'+total+' results'+(hidden?' \u00b7 showing first '+(total-hidden)+' \u2014 keep typing to narrow':'')+'</p>';
+    body+=sl.map(seriesRow).join('');
+    if(ml.length&&sl.length)body+='<p class="results">Movies</p>';
+    body+=ml.map(movieRow).join('');
+    if(total===0)body+='<p class="empty">Not in your library. Tap + Add to search all of TMDB for \u201c'+esc(view.q.trim())+'\u201d.</p>';
+    return body;
   }
-  if(!searching&&view.tab===4)body+='<div class="chips">'+[['all','All'],['watched','Watched'],['towatch','To watch']].map(([v,l])=>'<button data-mf="'+v+'" class="'+(view.mfilter===v?'on':'')+'">'+l+'</button>').join('')+'</div>';
-  body+=sl.map(seriesRow).join('');
-  if(searching&&ml.length&&sl.length)body+='<p class="results">Movies</p>';
-  body+=ml.map(movieRow).join('');
-  if(!searching&&view.tab===5){
+  if(view.nav==='stats'){
     const eps=data.series.reduce((a,s)=>a+showWatched(s),0);
     const mw=data.movies.filter(m=>m.w).length;
-    body+=statsView(eps,mw);
+    return statsView(eps,mw);
   }
-  if(!searching&&view.tab<=3&&sl.length===0)body+='<p class="empty">Nothing here yet. Add a show or move one into this list.</p>';
-  if(!searching&&view.tab===4&&ml.length===0)body+='<p class="empty">No movies match this filter.</p>';
-  if(searching&&sl.length+ml.length===0)body+='<p class="empty">Not in your library. Tap + Add to search all of TMDB for \u201c'+esc(view.q.trim())+'\u201d.</p>';
+  if(view.nav==='movies'){
+    let ml=data.movies;
+    if(view.mfilter==='watched')ml=ml.filter(m=>m.w);
+    if(view.mfilter==='towatch')ml=ml.filter(m=>!m.w);
+    ml=[...ml].sort((a,b)=>(b.l||'').localeCompare(a.l||'')||a.t.localeCompare(b.t));
+    let body='<div class="chips">'+[['all','All'],['watched','Watched'],['towatch','To watch']].map(([v,l])=>'<button data-mf="'+v+'" class="'+(view.mfilter===v?'on':'')+'">'+l+'</button>').join('')+'</div>';
+    body+=ml.map(movieRow).join('');
+    if(!ml.length)body+='<p class="empty">No movies match this filter.</p>';
+    return body;
+  }
+  // shows nav
+  const counts=[data.series.filter(s=>s.s===0).length,data.series.filter(s=>s.s===1).length,data.series.filter(s=>s.s===2).length,data.series.filter(s=>s.s===3).length];
+  const chips=[['next','Watch Next',counts[0]],['upcoming','Upcoming',''],['up','Up to date',counts[1]],['stopped','Stopped',counts[2]],['wl','Watchlist',counts[3]]];
+  let body='<div class="chips">'+chips.map(([v,l,c])=>'<button data-chip="'+v+'" class="'+(view.chip===v?'on':'')+'">'+l+' <em>'+c+'</em></button>').join('')+'</div>';
+  if(view.chip==='next'){
+    const list=data.series.filter(s=>s.s===0).map(s=>({s,ne:nextEp(s)})).filter(x=>x.ne)
+      .sort((a,b)=>(b.s.l||'').localeCompare(a.s.l||''));
+    const cutoff=new Date(Date.now()-30*864e5).toISOString().slice(0,10);
+    const recent=list.filter(x=>x.s.l&&x.s.l>=cutoff), stale=list.filter(x=>!(x.s.l&&x.s.l>=cutoff));
+    if(recent.length)body+='<p class="sectlabel">Watch next</p>'+recent.map(watchNextCard).join('');
+    if(stale.length)body+='<p class="sectlabel">Haven\u2019t watched for a while</p>'+stale.map(watchNextCard).join('');
+    if(!list.length)body+='<p class="empty">You\u2019re all caught up! Move a show here or add a new one.</p>';
+  }else if(view.chip==='upcoming'){
+    const cand=data.series.filter(s=>s.s<=1);
+    cand.forEach(s=>{if(!cache['s'+s.id])requestMeta(s,false);requestUpcoming(s)});
+    const items=cand.map(s=>({s,u:(cache['up'+s.id]||{}).air})).filter(x=>x.u&&x.u.d&&x.u.d>=today())
+      .sort((a,b)=>a.u.d.localeCompare(b.u.d));
+    const done=cand.filter(s=>{const c=cache['up'+s.id];return c&&c.f===today()}).length;
+    if(done<cand.length)body+='<p class="results">Checking air dates for your shows\u2026 '+done+'/'+cand.length+'</p>';
+    body+=items.map(upcomingCard).join('');
+    if(!items.length&&done>=cand.length)body+='<p class="empty">No upcoming episodes announced yet for the shows you follow.</p>';
+  }else{
+    const st={up:1,stopped:2,wl:3}[view.chip];
+    let sl=data.series.filter(s=>s.s===st).sort((a,b)=>(b.l||'').localeCompare(a.l||'')||a.t.localeCompare(b.t));
+    body+=sl.map(seriesRow).join('');
+    if(!sl.length)body+='<p class="empty">Nothing here yet.</p>';
+  }
   return body;
 }
 function updateMain(){
@@ -302,7 +425,7 @@ function updateMain(){
 function render(){
   const app=$('#app');
   if(view.detail){app.innerHTML=view.detail.movie?movieDetail(view.detail.item):showDetail(view.detail.item);bindDetail();return}
-  app.innerHTML=headerHTML()+'<main></main>';
+  app.innerHTML=headerHTML()+'<main></main>'+navHTML();
   bindHeader();
   updateMain();
   if(!settings.tmdb&&!settings.dismissedSetup){settings.dismissedSetup=1;saveSettings();openSettings(true)}
@@ -432,13 +555,13 @@ async function addFromTmdb(type,id){
       const j=await tmdb('/tv/'+id+'?append_to_response=external_ids');
       const seasons=(j.seasons||[]).filter(x=>x.season_number>0).map(x=>({n:x.season_number,total:x.episode_count||0,w:0,sp:false}));
       const it={id:nid(),t:j.name,s:3,f:false,tvdb:(j.external_ids&&j.external_ids.tvdb_id)||0,imdb:(j.external_ids&&j.external_ids.imdb_id)||'',seasons,l:''};
-      cache['s'+it.id]={id:j.id,p:j.poster_path||'',r:j.vote_average?+j.vote_average.toFixed(1):0};saveCache();
-      data.series.unshift(it);view.tab=3;
+      cache['s'+it.id]={id:j.id,p:j.poster_path||'',b:j.backdrop_path||'',r:j.vote_average?+j.vote_average.toFixed(1):0};saveCache();
+      data.series.unshift(it);view.nav='shows';view.chip='wl';
     }else{
       const j=await tmdb('/movie/'+id+'?append_to_response=external_ids');
       const it={id:nid(),t:j.title,y:j.release_date?+j.release_date.slice(0,4):null,w:false,f:false,imdb:(j.external_ids&&j.external_ids.imdb_id)||j.imdb_id||'',l:''};
       cache['m'+it.id]={id:j.id,p:j.poster_path||'',r:j.vote_average?+j.vote_average.toFixed(1):0};saveCache();
-      data.movies.unshift(it);view.tab=4;
+      data.movies.unshift(it);view.nav='movies';
     }
     save();closeOvl();view.q='';toast(type==='tv'?'Added to Watchlist':'Added to Movies');render();
   }catch(e){toast("Couldn't load details \u2014 try again")}
@@ -489,8 +612,8 @@ function openAdd(){
       $('#mcl').onclick=drawSearch;
       $('#mgo').onclick=()=>{const t=$('#mt').value.trim();if(!t)return;
         if(kind==='series'){const n=parseInt($('#mn').value)||0;
-          data.series.unshift({id:nid(),t,s:status,f:false,tvdb:0,imdb:'',seasons:n?[{n:1,total:n,w:0,sp:false}]:[],l:''});view.tab=status}
-        else{data.movies.unshift({id:nid(),t,y:parseInt($('#my').value)||null,w:false,f:false,imdb:'',l:''});view.tab=4}
+          data.series.unshift({id:nid(),t,s:status,f:false,tvdb:0,imdb:'',seasons:n?[{n:1,total:n,w:0,sp:false}]:[],l:''});view.nav='shows';view.chip=['next','up','stopped','wl'][status]}
+        else{data.movies.unshift({id:nid(),t,y:parseInt($('#my').value)||null,w:false,f:false,imdb:'',l:''});view.nav='movies'}
         save();d.remove();view.q='';toast('Added');render()};
     };
     draw();
@@ -508,17 +631,30 @@ function bindHeader(){
   $('#qclear').onclick=()=>{qi.value='';view.q='';$('#qclear').style.display='none';updateMain();};
   $('#gear').onclick=()=>openSettings(false);
   $('#addb').onclick=openAdd;
-  document.querySelectorAll('#app nav [data-tab]').forEach(b=>b.onclick=()=>{
-    view.tab=+b.dataset.tab;view.openSeason=null;
-    document.querySelectorAll('#app nav [data-tab]').forEach(x=>x.classList.toggle('on',x===b));
-    updateMain()});
+  document.querySelectorAll('.bottomnav [data-nav]').forEach(b=>b.onclick=()=>{
+    if(b.dataset.nav==='upcoming'){view.nav='shows';view.chip='upcoming'}
+    else{view.nav=b.dataset.nav;if(b.dataset.nav==='shows'&&view.chip==='upcoming')view.chip='next'}
+    view.openSeason=null;
+    document.querySelectorAll('.bottomnav [data-nav]').forEach(x=>x.classList.toggle('on',x.dataset.nav===b.dataset.nav));
+    updateMain();window.scrollTo(0,0)});
 }
 function bindMain(){
   const main=document.querySelector('#app main'); if(!main)return;
   main.querySelectorAll('[data-mf]').forEach(b=>b.onclick=()=>{view.mfilter=b.dataset.mf;updateMain()});
+  main.querySelectorAll('[data-chip]').forEach(b=>b.onclick=()=>{view.chip=b.dataset.chip;updateMain()});
   main.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const[k,id]=b.dataset.open.split(':');
     const item=(k==='s'?data.series:data.movies).find(x=>x.id===id);
     view.detail={item,movie:k==='m'};view.openSeason=null;window.scrollTo(0,0);render()});
+  main.querySelectorAll('[data-wn]').forEach(b=>b.onclick=e=>{e.stopPropagation();
+    const s=data.series.find(x=>x.id===b.dataset.wn); if(!s)return;
+    const ne=nextEp(s); if(!ne)return;
+    const se=s.seasons.find(x=>x.n===ne.sn&&!x.sp);
+    const key=s.tvdb?String(s.tvdb):s.t;
+    const local=(EPNAMES[key]||{})[String(ne.sn)]||null;
+    const nums=local?local.map(e=>e[0]):Array.from({length:se.total},(_,i)=>i+1);
+    setEp(se,ne.en,true,nums);s.l=today();
+    if(showTotal(s)>0&&showWatched(s)>=showTotal(s)&&s.s===0){s.s=1;toast('Up to date! \u2728')}
+    save();updateMain()});
 }
 function bindDetail(){
   const app=$('#app');

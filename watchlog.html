@@ -13,46 +13,41 @@
 <style>
 :root{--bg:#0F0D16;--card:#191625;--line:#2A2638;--txt:#EFECF6;--mut:#8E88A3;--acc:#F2B441;--grn:#6ED49B;--vio:#9D8CFF}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--txt);font:15px/1.4 -apple-system,'Segoe UI',Inter,sans-serif;padding-bottom:70px;padding-top:env(safe-area-inset-top)}
+body{background:radial-gradient(1100px 520px at 50% -12%, #201a38 0%, #0F0D16 58%) fixed, #0F0D16;color:var(--txt);font:15px/1.4 -apple-system,'Segoe UI',Inter,sans-serif;padding-bottom:110px;padding-top:env(safe-area-inset-top)}
 .mono{font-family:'SF Mono',ui-monospace,'IBM Plex Mono',monospace}
-header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 14px 6px;max-width:680px;margin:0 auto}
+header{position:sticky;top:0;z-index:5;background:linear-gradient(#0F0D16 82%,rgba(15,13,22,0));padding:14px 14px 6px;max-width:680px;margin:0 auto}
 .brand{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
 .mark{color:var(--acc);font-size:18px}
-h1{font-size:21px;font-weight:800;letter-spacing:-.02em}
+h1{font-size:21px;font-weight:800;letter-spacing:-.02em;background:linear-gradient(92deg,#F2B441 20%,#FF8A5B 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .tally{margin-left:auto;font-size:11px;color:var(--mut)}
 .gear{background:none;border:none;color:var(--mut);font-size:18px;padding:2px 4px}
-.srow{display:flex;gap:8px}
-.srow input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--txt);font-size:16px;outline:none;min-width:0}
+.srow{display:flex;gap:8px;position:relative}
+.srow input{flex:1;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 12px;color:var(--txt);font-size:16px;outline:none;min-width:0}
 .srow input:focus{border-color:var(--acc)}
-.addb{background:var(--acc);color:#1A1408;border:none;border-radius:10px;padding:0 14px;font-weight:700;font-size:14px}
-nav{display:flex;gap:6px;overflow-x:auto;padding:10px 0 6px;scrollbar-width:none}
-nav::-webkit-scrollbar{display:none}
-  body.searching nav{display:none}
-nav button,.chips button{background:var(--card);border:1px solid var(--line);color:#B9B3CC;border-radius:999px;padding:7px 12px;font-size:13px;white-space:nowrap}
-nav button.on,.chips button.on{background:var(--acc);border-color:var(--acc);color:#1A1408;font-weight:700}
-nav em{font-style:normal;font-size:11px;color:inherit;opacity:.65;margin-left:2px}
+.clear{position:absolute;right:86px;top:8px;background:none;border:none;color:var(--mut);font-size:14px;padding:4px}
+.addb{background:linear-gradient(135deg,#F2B441,#FF9A5B);color:#1A1408;border:none;border-radius:10px;padding:0 14px;font-weight:700;font-size:14px;flex-shrink:0;box-shadow:0 4px 18px rgba(242,180,65,.28)}
 main{padding:4px 14px;max-width:680px;margin:0 auto}
-.chips{display:flex;gap:6px;padding:4px 0 10px;flex-wrap:wrap}
-.empty{color:var(--mut);text-align:center;padding:40px 20px}
 .results{color:var(--mut);font-size:13px;padding:4px 2px 8px}
-/* rows */
-.row{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:8px;padding:10px;align-items:center;width:100%;text-align:left;color:var(--txt)}
+.chips{display:flex;gap:6px;padding:4px 0 10px;flex-wrap:wrap}
+.chips button{background:var(--card);border:1px solid var(--line);color:#B9B3CC;border-radius:999px;padding:7px 12px;font-size:13px;white-space:nowrap}
+.chips button.on{background:linear-gradient(135deg,#F2B441,#FF9A5B);border-color:transparent;color:#1A1408;font-weight:700;box-shadow:0 3px 14px rgba(242,180,65,.3)}
+.chips button em{font-style:normal;font-size:11px;opacity:.65;margin-left:2px}
+.empty{color:var(--mut);text-align:center;padding:40px 20px;line-height:1.5}
+.row{display:flex;gap:12px;background:linear-gradient(165deg,rgba(255,255,255,.055),rgba(255,255,255,.018));border:1px solid rgba(255,255,255,.09);border-radius:14px;margin-bottom:8px;padding:10px;align-items:center;width:100%;text-align:left;color:var(--txt)}
 button.row{cursor:pointer}
 .poster{width:52px;height:76px;border-radius:8px;background:#231F31;flex-shrink:0;object-fit:cover;display:flex;align-items:center;justify-content:center;color:#4a4460;font-size:20px;overflow:hidden}
 .poster img{width:100%;height:100%;object-fit:cover;display:block}
 .rmid{flex:1;min-width:0}
 .rt1{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rt2{color:var(--mut);font-size:12.5px;margin-top:2px}
-.badges{display:flex;gap:8px;margin-top:6px;font-size:11.5px;flex-wrap:wrap}
+.badges{display:flex;gap:8px;margin-top:6px;font-size:11.5px;flex-wrap:wrap;align-items:center}
 .bdg{color:var(--acc);font-weight:600}
-.bdg.g{color:var(--grn)}
+.ratebadge{font-size:13px}
 .prog{height:3px;background:#231F31;border-radius:2px;margin-top:7px;overflow:hidden}
 .prog i{display:block;height:100%;background:var(--acc)}
 .frac{font-size:13px;font-weight:600;flex-shrink:0}
 .frac em{color:var(--mut);font-style:normal;font-weight:400}
 .fav{color:var(--acc);font-style:normal;margin-right:4px;font-size:12px}
-.dot{width:8px;height:8px;border-radius:50%;position:absolute}
-/* detail screen */
 .screen{position:fixed;inset:0;background:var(--bg);z-index:20;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:60px}
 .hero{position:relative;padding:calc(14px + env(safe-area-inset-top)) 16px 16px;background:linear-gradient(#1c1830,var(--bg));display:flex;gap:14px}
 .back{position:sticky;top:calc(8px + env(safe-area-inset-top));background:rgba(15,13,22,.75);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:8px 14px;font-size:14px;margin:8px 0 0 14px;z-index:2;backdrop-filter:blur(6px)}
@@ -66,8 +61,17 @@ button.row{cursor:pointer}
 .acts button{background:#231F31;border:1px solid var(--line);color:#D9D4E8;border-radius:10px;padding:10px 13px;font-size:13.5px}
 .acts button.big{background:var(--acc);border-color:var(--acc);color:#1A1408;font-weight:700}
 .acts button.danger{color:#FF8A80;border-color:#4a2b2b;margin-left:auto}
-/* seasons */
-.season{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:8px;overflow:hidden}
+.ratebar{display:flex;gap:8px;margin:6px 0 10px}
+.rateb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#C9C3DB;border-radius:12px;padding:10px 0;font-size:12px}
+.rateb span{font-size:22px}
+.rateb.on{border-color:var(--acc);background:rgba(242,180,65,.14);color:var(--acc);font-weight:600}
+.provwrap{display:flex;align-items:center;gap:10px;margin:2px 0 12px;flex-wrap:wrap}
+.provlabel{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.provloading{color:var(--mut)}
+.provlist{display:flex;gap:8px;flex-wrap:wrap}
+.prov{width:38px;height:38px;border-radius:9px;overflow:hidden;background:#231F31;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--mut);padding:3px;text-align:center}
+.prov img{width:100%;height:100%;object-fit:cover;border-radius:7px}
+.season{background:linear-gradient(165deg,rgba(255,255,255,.055),rgba(255,255,255,.018));border:1px solid rgba(255,255,255,.09);border-radius:14px;margin-bottom:8px;overflow:hidden}
 .shead{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:var(--txt);padding:13px 14px;font-size:15px;font-weight:600;text-align:left}
 .shead .frac{margin-left:auto}
 .chk{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);background:#231F31;color:transparent;font-size:0;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:0;position:relative}
@@ -81,39 +85,29 @@ button.row{cursor:pointer}
 .ept{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .eprate{font-size:11.5px;color:var(--acc);font-weight:600;flex-shrink:0}
 .ep .chk{width:26px;height:26px}
-/* stats */
 .bignum{text-align:center;padding:20px 0 24px}
 .bignum .num{font-size:48px;font-weight:800;display:block;color:var(--acc);letter-spacing:-.03em}
 .bignum .lbl{color:var(--mut);font-size:13px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+.stat{background:linear-gradient(165deg,rgba(255,255,255,.055),rgba(255,255,255,.018));border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:14px;text-align:center}
 .stat .num{font-size:21px;font-weight:700;display:block}
 .stat .lbl{color:var(--mut);font-size:12px}
 .cardtop{display:block;text-align:center;margin-bottom:10px;font-weight:600;letter-spacing:.03em}
-.stat .num{display:block}
 .trio{display:flex;gap:16px;justify-content:center}
 .trio span{display:flex;flex-direction:column;align-items:center}
 .trio b{font-size:24px;font-weight:700;color:var(--acc)}
 .trio i{font-style:normal;color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
-/* overlay / sheet */
 .overlay{position:fixed;inset:0;background:rgba(8,7,12,.72);z-index:30;display:flex;align-items:flex-end;justify-content:center}
-.sheet{background:var(--card);border:1px solid var(--line);border-radius:16px 16px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:560px;max-height:85vh;overflow-y:auto}
+.sheet{background:linear-gradient(165deg,rgba(255,255,255,.055),rgba(255,255,255,.018)),var(--card);border:1px solid rgba(255,255,255,.09);border-radius:16px 16px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:560px;max-height:85vh;overflow-y:auto}
 .sheet h2{font-size:17px;margin-bottom:12px}
 .sheet input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--txt);font-size:16px;margin-bottom:10px;outline:none}
 .sheet input:focus{border-color:var(--acc)}
 .sheet p{color:var(--mut);font-size:13px;margin:2px 0 12px;line-height:1.5}
 .sheet a{color:var(--acc)}
-.toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--acc);color:#1A1408;font-weight:700;font-size:13px;padding:9px 16px;border-radius:999px;z-index:40}
+.toast{position:fixed;bottom:calc(90px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--acc);color:#1A1408;font-weight:700;font-size:13px;padding:9px 16px;border-radius:999px;z-index:40}
 .hide{display:none!important}
 button{cursor:pointer;font-family:inherit}
-
-body{background:radial-gradient(1100px 520px at 50% -12%, #201a38 0%, #0F0D16 58%) fixed, #0F0D16;padding-bottom:110px}
-h1{background:linear-gradient(92deg,#F2B441 20%,#FF8A5B 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.row,.season,.stat,.dist,.sheet{background:linear-gradient(165deg,rgba(255,255,255,.055),rgba(255,255,255,.018));border-color:rgba(255,255,255,.09)}
-.srow input{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.1)}
-.addb{background:linear-gradient(135deg,#F2B441,#FF9A5B);box-shadow:0 4px 18px rgba(242,180,65,.28)}
-nav button.on,.chips button.on{background:linear-gradient(135deg,#F2B441,#FF9A5B);border-color:transparent;box-shadow:0 3px 14px rgba(242,180,65,.3)}
-.chips button em{font-style:normal;font-size:11px;opacity:.65;margin-left:2px}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .sectlabel{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);text-align:center;margin:16px 0 10px;display:flex;align-items:center;gap:12px}
 .sectlabel::before,.sectlabel::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent)}
 .wn{display:flex;align-items:stretch;background:linear-gradient(165deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.09);border-radius:18px;margin-bottom:10px;overflow:hidden}
@@ -129,8 +123,10 @@ nav button.on,.chips button.on{background:linear-gradient(135deg,#F2B441,#FF9A5B
 .wncheck{width:66px;border:none;background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
 .wncheck svg{width:44px;height:44px;padding:12px;border-radius:50%;background:linear-gradient(135deg,#F2B441,#FF9A5B);color:#1A1408;box-shadow:0 0 20px rgba(242,180,65,.35);transition:transform .12s}
 .wncheck:active svg{transform:scale(.86)}
+.wndate{display:flex;align-items:center;padding:0 16px;flex-shrink:0}
+.wndate b{font-size:12px;font-weight:700;color:#F2B441;background:rgba(242,180,65,.13);border:1px solid rgba(242,180,65,.3);border-radius:999px;padding:6px 11px;white-space:nowrap}
 .bottomnav{position:fixed;left:14px;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));display:flex;background:rgba(19,16,30,.78);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:7px;z-index:6;max-width:520px;margin:0 auto;box-shadow:0 12px 40px rgba(0,0,0,.5)}
-.bottomnav button{flex:1;background:none;border:none;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;padding:8px 0;border-radius:17px;cursor:pointer}
+.bottomnav button{flex:1;background:none;border:none;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:8px 0;border-radius:17px;cursor:pointer}
 .bottomnav button.on{color:#F2B441;background:rgba(242,180,65,.12)}
 .bottomnav svg{width:22px;height:22px}
 body.searching .bottomnav{display:none}
@@ -160,16 +156,7 @@ body.searching .bottomnav{display:none}
 .bstrip button{flex-shrink:0;width:110px;height:62px;border-radius:10px;overflow:hidden;border:2px solid transparent;padding:0;background:#231F31}
 .bstrip button.on{border-color:var(--acc)}
 .bstrip img{width:100%;height:100%;object-fit:cover;display:block}
-.wndate{display:flex;align-items:center;padding:0 16px;flex-shrink:0}
-.wndate b{font-size:12px;font-weight:700;color:#F2B441;background:rgba(242,180,65,.13);border:1px solid rgba(242,180,65,.3);border-radius:999px;padding:6px 11px;white-space:nowrap}
-.bottomnav button{font-size:10px}
-
-.wndate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0 14px;flex-shrink:0}
-.wndate b{color:#F2B441;font-size:14px;white-space:nowrap}
-.wndate span{color:var(--mut);font-size:10.5px}
-.chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chips button{flex-shrink:0}
+@media (prefers-reduced-motion: reduce){.prog i,.wncheck svg{transition:none}}
 </style>
 </head>
 <body>
@@ -340,6 +327,35 @@ function requestOmdb(item){
       if(view.detail&&view.detail.item.id===item.id)render();
     }catch(e){delete cache[key+'_x']}
   });
+}
+function requestProviders(item,isMovie){
+  const m=cache[(isMovie?'m':'s')+item.id]; if(!m||!m.id||!settings.tmdb)return;
+  const key='pv'+(isMovie?'m':'s')+m.id, t=today();
+  const c=cache[key]; if(c&&c.f===t)return;
+  if(pending.has(key))return; pending.add(key);
+  enqueue(async()=>{try{
+    const reg=(navigator.language||'en-US').split('-')[1]||'US';
+    const j=await tmdb('/'+(isMovie?'movie':'tv')+'/'+m.id+'/watch/providers');
+    const r=(j.results&&(j.results[reg]||j.results.US))||null;
+    const flat=r&&r.flatrate?r.flatrate.slice(0,4).map(p=>({n:p.provider_name,l:p.logo_path})):[];
+    cache[key]={f:t,reg:r?(j.results[reg]?reg:'US'):'',pv:flat,link:r&&r.link?r.link:''};
+    pending.delete(key);saveCache();
+    if(view.detail&&view.detail.item.id===item.id)render();
+  }catch(e){pending.delete(key)}});
+}
+const RATE=[{v:1,e:'\ud83d\udc4e',l:'Dislike'},{v:2,e:'\ud83d\ude10',l:'Meh'},{v:3,e:'\ud83d\udc4d',l:'Like'}];
+function rateBar(item,isMovie){
+  const cur=item.rate||0;
+  return '<div class="ratebar">'+RATE.map(r=>'<button class="rateb'+(cur===r.v?' on':'')+'" data-rate="'+r.v+'"><span>'+r.e+'</span>'+r.l+'</button>').join('')+'</div>';
+}
+function providerRow(item,isMovie){
+  const m=cache[(isMovie?'m':'s')+item.id]; if(!m||!m.id)return '';
+  requestProviders(item,isMovie);
+  const p=cache['pv'+(isMovie?'m':'s')+m.id];
+  if(!p)return '<div class="provwrap"><span class="provlabel">Where to watch</span><span class="provloading">\u2026</span></div>';
+  if(!p.pv.length)return '';
+  return '<div class="provwrap"><span class="provlabel">Where to watch</span><div class="provlist">'
+    +p.pv.map(x=>'<span class="prov" title="'+esc(x.n)+'">'+(x.l?'<img src="'+IMG+x.l+'" alt="'+esc(x.n)+'">':esc(x.n))+'</span>').join('')+'</div></div>';
 }
 function requestSeasonEps(item,seasonNum){
   const m=metaFor(item,false); if(!m||!m.id||!settings.tmdb)return null;
@@ -525,7 +541,8 @@ function mainBody(){
   }
   // shows nav
   const counts=[data.series.filter(s=>s.s===0).length,data.series.filter(s=>s.s===1).length,data.series.filter(s=>s.s===2).length,data.series.filter(s=>s.s===3).length];
-  const chips=[['next','Watch Next',counts[0]],['upcoming','Upcoming',''],['up','Up to date',counts[1]],['stopped','Stopped',counts[2]],['wl','Watchlist',counts[3]]];
+  const ratedN=data.series.filter(s=>s.rate===3).length+data.movies.filter(m=>m.rate===3).length;
+  const chips=[['next','Watch Next',counts[0]],['upcoming','Upcoming',''],['up','Up to date',counts[1]],['stopped','Stopped',counts[2]],['wl','Watchlist',counts[3]],['top','❤ Loved',ratedN]];
   let body='<div class="chips">'+chips.map(([v,l,c])=>'<button data-chip="'+v+'" class="'+(view.chip===v?'on':'')+'">'+l+' <em>'+c+'</em></button>').join('')+'</div>';
   if(view.chip==='next'){
     const list=data.series.filter(s=>s.s===0).map(s=>({s,ne:nextEp(s)})).filter(x=>x.ne)
@@ -544,6 +561,12 @@ function mainBody(){
     if(never)body+='<p class="results">Checking air dates\u2026 '+(cand.length-never)+'/'+cand.length+'</p>';
     body+=items.map(upcomingCard).join('');
     if(!items.length&&!never)body+='<p class="empty">No upcoming episodes announced yet for the shows you follow.</p>';
+  }else if(view.chip==='top'){
+    const sMovies=new Set(data.movies);
+    const liked=[...data.series.filter(s=>s.rate===3),...data.movies.filter(m=>m.rate===3)]
+      .sort((a,b)=>(b.l||'').localeCompare(a.l||'')||a.t.localeCompare(b.t));
+    body+=liked.map(x=>sMovies.has(x)?movieRow(x):seriesRow(x)).join('');
+    if(!liked.length)body+='<p class="empty">Nothing loved yet. Tap 👍 on any show or movie to add it here.</p>';
   }else{
     const st={up:1,stopped:2,wl:3}[view.chip];
     let sl=data.series.filter(s=>s.s===st).sort((a,b)=>(b.l||'').localeCompare(a.l||'')||a.t.localeCompare(b.t));
@@ -578,7 +601,7 @@ function seriesRow(s){
   return '<button class="row" data-open="s:'+s.id+'">'+posterCell(key)
   +'<div class="rmid"><div class="rt1">'+(s.f?'<i class="fav">★</i>':'')+esc(s.t)+'</div>'
   +'<div class="rt2">'+st.l+(s.l?' · '+s.l:'')+'</div>'
-  +'<div class="badges"><span class="bdg" data-r="'+key+'">'+(m&&m.r?'★ '+m.r:'')+'</span></div>'
+  +'<div class="badges"><span class="bdg" data-r="'+key+'">'+(m&&m.r?'★ '+m.r:'')+'</span>'+(s.rate?'<span class="ratebadge">'+['','👎','😐','👍'][s.rate]+'</span>':'')+'</div>'
   +'<div class="prog"><i style="width:'+pct+'%;background:'+st.c+'"></i></div></div>'
   +'<span class="frac mono">'+w+'<em>/'+(n||'?')+'</em></span></button>';
 }
@@ -587,7 +610,7 @@ function movieRow(mv){
   return '<button class="row" data-open="m:'+mv.id+'">'+posterCell(key)
   +'<div class="rmid"><div class="rt1">'+(mv.f?'<i class="fav">★</i>':'')+esc(mv.t)+(mv.y?' <span style="color:var(--mut);font-weight:400">'+mv.y+'</span>':'')+'</div>'
   +'<div class="rt2">'+(mv.w?'Watched'+(mv.l?' '+mv.l:''):'Not watched')+'</div>'
-  +'<div class="badges"><span class="bdg" data-r="'+key+'">'+(m&&m.r?'★ '+m.r:'')+'</span></div></div>'
+  +'<div class="badges"><span class="bdg" data-r="'+key+'">'+(m&&m.r?'★ '+m.r:'')+'</span>'+(mv.rate?'<span class="ratebadge">'+['','👎','😐','👍'][mv.rate]+'</span>':'')+'</div></div>'
   +'<span class="frac mono" style="color:'+(mv.w?'var(--grn)':'var(--mut)')+'">'+(mv.w?'✓':'—')+'</span></button>';
 }
 function statsView(eps,mw){
@@ -647,7 +670,7 @@ function showDetail(s){
   +(o&&o.imdb?'<span style="color:#F5C518">IMDb <b>'+o.imdb+'</b></span>':'')
   +(o&&o.rt?'<span style="color:#FA320A">🍅 <b>'+o.rt+'</b></span>':'')+'</div>'
   +'<div class="rates" style="margin-top:8px"><span class="mono">'+w+' / '+n+' episodes</span></div></div></div>'
-  +'<div class="sect"><div class="acts">'
+  +'<div class="sect">'+providerRow(s,false)+rateBar(s,false)+'<div class="acts">'
   +STATUS.map((x,i)=>i===s.s?'':'<button data-st="'+i+'">→ '+x.l+'</button>').join('')
   +'<button data-fav="1">'+(s.f?'★ Unfavorite':'☆ Favorite')+'</button>'
   +'<button class="danger" data-del="1">Delete</button></div>'+seasons+'</div></div>';
@@ -661,7 +684,7 @@ function movieDetail(mv){
   +'<div class="rates">'+(m&&m.r?'<span style="color:var(--acc)">TMDB <b>'+m.r+'</b></span>':'')
   +(o&&o.imdb?'<span style="color:#F5C518">IMDb <b>'+o.imdb+'</b></span>':'')
   +(o&&o.rt?'<span style="color:#FA320A">🍅 <b>'+o.rt+'</b></span>':'')+'</div></div></div>'
-  +'<div class="sect"><div class="acts"><button class="big" data-mw="1">'+(mv.w?'Mark unwatched':'Mark watched')+'</button>'
+  +'<div class="sect">'+providerRow(mv,true)+rateBar(mv,true)+'<div class="acts"><button class="big" data-mw="1">'+(mv.w?'Mark unwatched':'Mark watched')+'</button>'
   +'<button data-fav="1">'+(mv.f?'★ Unfavorite':'☆ Favorite')+'</button>'
   +'<button class="danger" data-del="1">Delete</button></div></div></div>';
 }
@@ -738,7 +761,24 @@ function openAdd(){
     inp.onkeydown=e=>{if(e.key==='Enter')doSearch()};
     $('#asr').onclick=doSearch;$('#acl').onclick=()=>d.remove();
     $('#aman').onclick=e=>{e.preventDefault();drawManual()};
+    showTrending();
   };
+  async function showTrending(){
+    if(!settings.tmdb)return;
+    const box=$('#ares'); if(!box||$('#at').value.trim())return;
+    box.innerHTML='<p class="results">Trending now</p>';
+    try{
+      const j=await tmdb('/trending/all/week');
+      if($('#at').value.trim())return;
+      const rows=(j.results||[]).filter(r=>r.media_type==='tv'||r.media_type==='movie').slice(0,8)
+        .map(r=>({ty:r.media_type,id:r.id,t:r.title||r.name,y:(r.release_date||r.first_air_date||'').slice(0,4),p:r.poster_path,r:r.vote_average}));
+      if(!rows.length){box.innerHTML='';return}
+      box.innerHTML='<p class="results">Trending now</p>'+rows.map(r=>'<button class="row" data-pick="'+r.ty+':'+r.id+'">'
+        +'<div class="poster">'+(r.p?'<img loading="lazy" src="'+IMG+r.p+'" alt="">':'\u25b8')+'</div>'
+        +'<div class="rmid"><div class="rt1">'+esc(r.t)+'</div><div class="rt2">'+(r.ty==='tv'?'Show':'Movie')+(r.y?' \u00b7 '+r.y:'')+(r.r?' \u00b7 \u2605 '+(+r.r).toFixed(1):'')+'</div></div></button>').join('');
+      box.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{const[ty,pid]=b.dataset.pick.split(':');b.querySelector('.rt2').textContent='Adding\u2026';addFromTmdb(ty,+pid)});
+    }catch(e){box.innerHTML=''}
+  }
   async function doSearch(){
     const qv=$('#at').value.trim();if(!qv)return;
     if(!settings.tmdb){$('#ares').innerHTML='<p class="results">Add your TMDB key in \u2699\ufe0e settings to search.</p>';return}
@@ -809,16 +849,30 @@ function bindMain(){
   main.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const[k,id]=b.dataset.open.split(':');
     const item=(k==='s'?data.series:data.movies).find(x=>x.id===id);
     view.detail={item,movie:k==='m'};view.openSeason=null;window.scrollTo(0,0);render()});
-  main.querySelectorAll('[data-wn]').forEach(b=>b.onclick=e=>{e.stopPropagation();
-    const s=data.series.find(x=>x.id===b.dataset.wn); if(!s)return;
-    const ne=nextEp(s); if(!ne)return;
-    const se=s.seasons.find(x=>x.n===ne.sn&&!x.sp);
-    const key=s.tvdb?String(s.tvdb):s.t;
-    const local=(EPNAMES[key]||{})[String(ne.sn)]||null;
-    const nums=local?local.map(e=>e[0]):Array.from({length:se.total},(_,i)=>i+1);
-    setEp(se,ne.en,true,nums);s.l=today();
-    if(showTotal(s)>0&&showWatched(s)>=showTotal(s)&&s.s===0){s.s=1;toast('Up to date! \u2728')}
-    save();updateMain()});
+  main.querySelectorAll('[data-wn]').forEach(b=>b.onclick=e=>{e.stopPropagation();logNext(b.dataset.wn)});
+  main.querySelectorAll('.wn').forEach(card=>{
+    const btn=card.querySelector('[data-wn]'); if(!btn)return;
+    const sid=btn.dataset.wn; let x0=null,dx=0,dragging=false;
+    const mainEl=card.querySelector('.wnmain');
+    card.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;dx=0;dragging=true;card.style.transition='none'},{passive:true});
+    card.addEventListener('touchmove',e=>{if(!dragging)return;dx=e.touches[0].clientX-x0;
+      if(dx>0){if(mainEl)mainEl.style.transform='translateX('+Math.min(dx,90)+'px)';
+        card.style.background=dx>70?'linear-gradient(90deg,rgba(110,212,155,.28),rgba(255,255,255,.03))':'';}},{passive:true});
+    card.addEventListener('touchend',()=>{if(!dragging)return;dragging=false;
+      card.style.transition='';if(mainEl)mainEl.style.transform='';card.style.background='';
+      if(dx>70)logNext(sid);});
+  });
+}
+function logNext(sid){
+  const s=data.series.find(x=>x.id===sid); if(!s)return;
+  const ne=nextEp(s); if(!ne)return;
+  const se=s.seasons.find(x=>x.n===ne.sn&&!x.sp);
+  const key=s.tvdb?String(s.tvdb):s.t;
+  const local=(EPNAMES[key]||{})[String(ne.sn)]||null;
+  const nums=local?local.map(e=>e[0]):Array.from({length:se.total},(_,i)=>i+1);
+  setEp(se,ne.en,true,nums);s.l=today();
+  if(showTotal(s)>0&&showWatched(s)>=showTotal(s)&&s.s===0){s.s=1;toast('Up to date! \u2728')}
+  save();updateMain();
 }
 function bindDetail(){
   const app=$('#app');
@@ -826,6 +880,7 @@ function bindDetail(){
   const it=view.detail.item, kind=view.detail.movie?'movies':'series';
   app.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{it.s=+b.dataset.st;save();render()});
   app.querySelectorAll('[data-fav]').forEach(b=>b.onclick=()=>{it.f=!it.f;save();render()});
+  app.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>{const v=+b.dataset.rate;it.rate=(it.rate===v?0:v);save();render()});
   app.querySelectorAll('[data-mw]').forEach(b=>b.onclick=()=>{it.w=!it.w;if(it.w)it.l=today();save();render()});
   app.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(!confirm('Delete "'+it.t+'" from your library?'))return;
     data[kind]=data[kind].filter(x=>x.id!==it.id);save();view.detail=null;render();toast('Removed')});
